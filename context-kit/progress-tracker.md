@@ -4,18 +4,18 @@
 ---
 ## Phase 1 — Project Setup & Auth
 ### Backend
-- [ ] FastAPI project structure initialized
-- [ ] `.env` + `config.py` set up
-- [ ] `database.py` with async SQLAlchemy
-- [ ] `User` ORM model created
-- [ ] Alembic initialized + initial migration run
-- [ ] `auth_service.py` implemented (register + login)
-- [ ] `security.py` implemented (bcrypt + JWT)
-- [ ] `auth.py` router: `POST /auth/register`
-- [ ] `auth.py` router: `POST /auth/login`
-- [ ] `get_current_user` dependency implemented
-- [ ] CORS middleware configured
-- [ ] Auth endpoints tested via Swagger UI
+- [x] FastAPI project structure initialized
+- [x] `.env` + `config.py` set up
+- [x] `database.py` with async SQLAlchemy
+- [x] `User` ORM model created
+- [x] Alembic initialized + initial migration run
+- [x] `auth_service.py` implemented (register + login)
+- [x] `security.py` implemented (bcrypt + JWT)
+- [x] `auth.py` router: `POST /auth/register`
+- [x] `auth.py` router: `POST /auth/login`
+- [x] `get_current_user` dependency implemented
+- [x] CORS middleware configured
+- [x] Auth endpoints tested via Swagger UI
 ### Frontend
 - [ ] Vite + React project initialized
 - [ ] React Router v6 routes configured
@@ -108,21 +108,8 @@
 ---
 ## Notes / Decisions Log
 > Record important decisions made during development here.
-|
- Date 
-|
- Decision 
-|
- Reason 
-|
-|
-------
-|
-----------
-|
---------
-|
-|
-|
-|
-|
+| Date | Decision | Reason |
+|------|----------|--------|
+| 2026-08-09 | Direct Supabase DB host (`db.*.supabase.co`) is IPv6-only and unreachable from this machine; switched to **transaction pooler** (`aws-0-ap-northeast-1.pooler.supabase.com:6543`) with `?ssl=require`. | Pooler resolves to IPv4 and allows SSL; direct host has only an AAAA record and no IPv6 route. |
+| 2026-08-09 | Disabled asyncpg statement caching (`statement_cache_size=0`, `prepared_statement_cache_size=0`) in `database.py` and `alembic/env.py`. | Supabase transaction pooler does not support asyncpg prepared statements (`DuplicatePreparedStatementError`). |
+| 2026-08-09 | Pinned `bcrypt==4.0.1` in `requirements.txt`. | `passlib 1.7.4` is incompatible with `bcrypt>=4.1` (removed `__about__`), crashing register with 500. |
