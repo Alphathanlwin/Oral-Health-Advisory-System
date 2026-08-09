@@ -1,0 +1,23 @@
+import enum
+
+
+class RiskLevel(enum.Enum):
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
+
+
+class Urgency(enum.Enum):
+    IMMEDIATE = "IMMEDIATE"
+    WITHIN_1_WEEK = "WITHIN_1_WEEK"
+    WITHIN_1_MONTH = "WITHIN_1_MONTH"
+    MONITOR_AT_HOME = "MONITOR_AT_HOME"
+
+
+class Condition(enum.Enum):
+    DENTAL_CAVITY = "DENTAL_CAVITY"
+    GINGIVITIS = "GINGIVITIS"
+    TOOTH_ABSCESS = "TOOTH_ABSCESS"
+    ENAMEL_EROSION = "ENAMEL_EROSION"
+    CANKER_SORES = "CANKER_SORES"
+    TOOTH_SENSITIVITY = "TOOTH_SENSITIVITY"
