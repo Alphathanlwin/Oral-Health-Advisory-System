@@ -32,3 +32,25 @@ class UnauthorizedException(HTTPException):
                 "message": "Missing or invalid authentication token.",
             },
         )
+
+
+class InvalidImageFormatException(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=400,
+            detail={
+                "code": "INVALID_IMAGE_FORMAT",
+                "message": "Unsupported image. Use a JPEG, PNG, or WEBP photo of at least 100x100px.",
+            },
+        )
+
+
+class ImageTooLargeException(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=400,
+            detail={
+                "code": "IMAGE_TOO_LARGE",
+                "message": "Image exceeds the 5 MB size limit.",
+            },
+        )
