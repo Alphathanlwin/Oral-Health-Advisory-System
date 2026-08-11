@@ -17,14 +17,14 @@
 - [x] CORS middleware configured
 - [x] Auth endpoints tested via Swagger UI
 ### Frontend
-- [ ] Vite + React project initialized
-- [ ] React Router v6 routes configured
-- [ ] `AuthContext.jsx` implemented
-- [ ] `LoginPage.jsx` built and connected to API
-- [ ] `RegisterPage.jsx` built and connected to API
-- [ ] `ProtectedRoute.jsx` implemented
-- [ ] `Navbar.jsx` built
-- [ ] Global CSS design system applied (dark theme, colors, typography)
+- [x] Vite + React project initialized
+- [x] React Router routes configured (using v7, not v6 as originally planned)
+- [x] `AuthContext.jsx` implemented
+- [x] `LoginPage.jsx` built and connected to API
+- [x] `RegisterPage.jsx` built and connected to API
+- [x] `ProtectedRoute.jsx` implemented
+- [x] `Navbar.jsx` built
+- [x] Global CSS design system applied (dark theme, colors, typography)
 ---
 ## Phase 2 — Symptom Questionnaire
 ### Backend
@@ -59,7 +59,7 @@
 - [ ] `POST /assessments/` wired to full service
 ### Frontend
 - [ ] `ResultPage.jsx` built
-- [ ] `RiskBadge.jsx` component built
+- [x] `RiskBadge.jsx` component built
 - [ ] `DiagnosisCard.jsx` component built
 - [ ] `RecommendationCard.jsx` component built
 - [ ] Navigation to ResultPage after submission working
@@ -84,7 +84,7 @@
 - [ ] Eager loading for diagnoses + recommendations added
 ### Frontend
 - [ ] `HistoryPage.jsx` built with paginated list
-- [ ] `DashboardPage.jsx` built (stats + recent assessments)
+- [x] `DashboardPage.jsx` built (stats + recent assessments)
 - [ ] History rows clickable → navigate to ResultPage
 ---
 ## Phase 6 — Polish & Final Review
@@ -113,3 +113,5 @@
 | 2026-08-09 | Direct Supabase DB host (`db.*.supabase.co`) is IPv6-only and unreachable from this machine; switched to **transaction pooler** (`aws-0-ap-northeast-1.pooler.supabase.com:6543`) with `?ssl=require`. | Pooler resolves to IPv4 and allows SSL; direct host has only an AAAA record and no IPv6 route. |
 | 2026-08-09 | Disabled asyncpg statement caching (`statement_cache_size=0`, `prepared_statement_cache_size=0`) in `database.py` and `alembic/env.py`. | Supabase transaction pooler does not support asyncpg prepared statements (`DuplicatePreparedStatementError`). |
 | 2026-08-09 | Pinned `bcrypt==4.0.1` in `requirements.txt`. | `passlib 1.7.4` is incompatible with `bcrypt>=4.1` (removed `__about__`), crashing register with 500. |
+| 2026-08-11 | Deleted the stray empty `frontend/src/context/AuthContext.js` (duplicate of `AuthContext.jsx`); it was shadowing the real module and broke every extension-less `from '../context/AuthContext'` import, failing the Vite build. | Discovered while building/testing `DashboardPage.jsx`; both files were tracked from the initial scaffold commit. |
+| 2026-08-11 | Added minimal "Coming soon" placeholder default exports to `HistoryPage.jsx`, `NewAssessmentPage.jsx`, `ResultPage.jsx` (previously empty files). | `App.jsx` statically imports every page, so the empty files blocked the whole app from building/booting even to test `DashboardPage.jsx`. Not real implementations — still pending in Phases 2-5. |

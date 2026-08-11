@@ -1,5 +1,5 @@
 {
-  "version": "2.14",
+  "version": "2.17",
   "children": [
     {
       "type": "frame",
@@ -749,6 +749,7 @@
             "bottom": 1
           },
           "strokeAlignment": "inner",
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "children": [
             {
@@ -3543,6 +3544,7 @@
             "bottom": 1
           },
           "strokeAlignment": "inner",
+          "strokeLinejoin": "round",
           "alignItems": "center"
         },
         {
@@ -5124,6 +5126,7 @@
                           "strokeWidth": {
                             "top": 1
                           },
+                          "strokeLinejoin": "round",
                           "gap": 16,
                           "padding": [
                             16,
@@ -5188,6 +5191,7 @@
                           "strokeWidth": {
                             "top": 1
                           },
+                          "strokeLinejoin": "round",
                           "gap": 16,
                           "padding": [
                             16,
@@ -5549,7 +5553,8 @@
                           "fill": "$ohas-muted",
                           "content": "Pain & Sensitivity",
                           "fontFamily": "$ohas-font-body",
-                          "fontSize": 13
+                          "fontSize": 13,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -5654,7 +5659,8 @@
                           "fill": "$ohas-muted",
                           "content": "Mouth & Habits",
                           "fontFamily": "$ohas-font-body",
-                          "fontSize": 13
+                          "fontSize": 13,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -5706,7 +5712,8 @@
                           "fill": "$ohas-muted",
                           "content": "Hygiene & Photo",
                           "fontFamily": "$ohas-font-body",
-                          "fontSize": 13
+                          "fontSize": 13,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -7809,6 +7816,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "gap": 16,
                       "padding": [
                         14,
@@ -7893,6 +7901,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "gap": 16,
                       "padding": [
                         14,
@@ -7977,6 +7986,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "gap": 16,
                       "padding": [
                         14,
@@ -8061,6 +8071,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "gap": 16,
                       "padding": [
                         14,
@@ -8145,6 +8156,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "gap": 16,
                       "padding": [
                         14,
@@ -8229,6 +8241,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "gap": 16,
                       "padding": [
                         14,
@@ -8313,6 +8326,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "gap": 16,
                       "padding": [
                         14,
@@ -8641,6 +8655,7 @@
       "strokeWidth": {
         "bottom": 1
       },
+      "strokeLinejoin": "round",
       "gap": 12,
       "padding": [
         0,
