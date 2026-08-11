@@ -30,18 +30,18 @@
 ### Backend
 - [x] `Assessment` ORM model created
 - [x] `SymptomResponse` ORM model created
-- [/] Migration for assessments + symptom_responses tables written (not yet run — no local `.env`/DB available in this environment)
+- [x] Migration for assessments + symptom_responses tables run
 - [x] `SymptomPayload` Pydantic schema created
 - [x] `POST /assessments/` stub endpoint implemented (saves symptoms, returns dummy `risk_level: LOW`)
 ### Frontend
-- [ ] `NewAssessmentPage.jsx` with 4-step stepper built
-- [ ] `SymptomToggle.jsx` component built
-- [ ] Step 1 form (Pain & Sensitivity) built
-- [ ] Step 2 form (Gum & Appearance) built
-- [ ] Step 3 form (Mouth & Habits) built
-- [ ] Step 4 form (Hygiene & Photo) built
-- [ ] Step navigation (Back / Next) working
-- [ ] Submit button wired to `POST /api/v1/assessments/`
+- [x] `NewAssessmentPage.jsx` with 4-step stepper built
+- [x] `SymptomToggle.jsx` component built
+- [x] Step 1 form (Pain & Sensitivity) built
+- [x] Step 2 form (Gum & Appearance) built
+- [x] Step 3 form (Mouth & Habits) built
+- [x] Step 4 form (Hygiene & Photo) built — photo upload added (`PhotoUpload.jsx`)
+- [x] Step navigation (Back / Next) working
+- [x] Submit button wired to `POST /api/v1/assessments/`
 ---
 ## Phase 3 — Prolog Diagnosis Engine
 ### Prolog
@@ -66,16 +66,16 @@
 ---
 ## Phase 4 — Photo Upload & CV Integration
 ### Backend
-- [ ] `uploads/` directory structure created
-- [ ] `image_utils.py` implemented (validation + save)
-- [ ] `cv_service.py` implemented (HuggingFace API call)
-- [ ] CV label → symptom key mapping implemented
-- [ ] CV results integrated into `assessment_service.py`
-- [ ] Graceful fallback on `CV_SERVICE_UNAVAILABLE`
+- [x] `uploads/` directory structure created
+- [x] `image_utils.py` implemented (validation + save)
+- [x] `cv_service.py` implemented (HuggingFace API call)
+- [x] CV label → symptom key mapping implemented
+- [x] CV results integrated into `assessment_service.py`
+- [x] Graceful fallback on `CV_SERVICE_UNAVAILABLE`
 ### Frontend
-- [ ] `PhotoUpload.jsx` component built
-- [ ] Photo upload added to Step 4
-- [ ] Base64 encoding of photo in payload working
+- [x] `PhotoUpload.jsx` component built
+- [x] Photo upload added to Step 4
+- [x] Base64 encoding of photo in payload working
 ---
 ## Phase 5 — History & Dashboard
 ### Backend
@@ -113,3 +113,6 @@
 | 2026-08-09 | Direct Supabase DB host (`db.*.supabase.co`) is IPv6-only and unreachable from this machine; switched to **transaction pooler** (`aws-0-ap-northeast-1.pooler.supabase.com:6543`) with `?ssl=require`. | Pooler resolves to IPv4 and allows SSL; direct host has only an AAAA record and no IPv6 route. |
 | 2026-08-09 | Disabled asyncpg statement caching (`statement_cache_size=0`, `prepared_statement_cache_size=0`) in `database.py` and `alembic/env.py`. | Supabase transaction pooler does not support asyncpg prepared statements (`DuplicatePreparedStatementError`). |
 | 2026-08-09 | Pinned `bcrypt==4.0.1` in `requirements.txt`. | `passlib 1.7.4` is incompatible with `bcrypt>=4.1` (removed `__about__`), crashing register with 500. |
+| 2026-08-11 | `PhotoUpload.jsx` emits the full `data:` URI to the page; `NewAssessmentPage.jsx` strips the prefix and sends raw base64 as `photo_base64`. | Backend `decode_base64_image` also accepts the `data:` URI, but raw base64 keeps the payload minimal. |
+| 2026-08-11 | Ran the previously-pending `c243bf08b89a_create_assessments_and_symptom_` migration against the live Supabase DB (`alembic upgrade head`). | The DB was unreachable in the session that wrote the migration; this session's `.env` reaches it fine, and applying it was required to test the CV/photo work end-to-end. User confirmed before running. |
+| 2026-08-11 | `CVServiceUnavailableError` (plain `Exception`, not `HTTPException`) is caught inside `assessment_service.create()` and never surfaces to the client — `image_analysis_result` is set to `{"status": "CV_SERVICE_UNAVAILABLE"}` and the assessment still saves with symptom-only data. | Photo is optional; a CV outage must not fail assessment submission (Phase 4 requirement: "Handle CV_SERVICE_UNAVAILABLE gracefully"). Verified live: real HF call fails against the placeholder `.env` token and the fallback path saves correctly (HTTP 201). |
