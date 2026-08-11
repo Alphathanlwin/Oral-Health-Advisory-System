@@ -3,7 +3,7 @@ from datetime import date, datetime
 
 from sqlalchemy import Date, DateTime, String, text
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models.base import Base
 
@@ -26,4 +26,8 @@ class User(Base):
         server_default=text("NOW()"),
         onupdate=text("NOW()"),
         nullable=False,
+    )
+
+    assessments: Mapped[list["Assessment"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
     )

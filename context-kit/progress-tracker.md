@@ -28,11 +28,11 @@
 ---
 ## Phase 2 — Symptom Questionnaire
 ### Backend
-- [ ] `Assessment` ORM model created
-- [ ] `SymptomResponse` ORM model created
-- [ ] Migration for assessments + symptom_responses tables run
-- [ ] `SymptomPayload` Pydantic schema created
-- [ ] `POST /assessments/` stub endpoint implemented
+- [x] `Assessment` ORM model created
+- [x] `SymptomResponse` ORM model created
+- [/] Migration for assessments + symptom_responses tables written (not yet run — no local `.env`/DB available in this environment)
+- [x] `SymptomPayload` Pydantic schema created
+- [x] `POST /assessments/` stub endpoint implemented (saves symptoms, returns dummy `risk_level: LOW`)
 ### Frontend
 - [ ] `NewAssessmentPage.jsx` with 4-step stepper built
 - [ ] `SymptomToggle.jsx` component built
@@ -113,5 +113,3 @@
 | 2026-08-09 | Direct Supabase DB host (`db.*.supabase.co`) is IPv6-only and unreachable from this machine; switched to **transaction pooler** (`aws-0-ap-northeast-1.pooler.supabase.com:6543`) with `?ssl=require`. | Pooler resolves to IPv4 and allows SSL; direct host has only an AAAA record and no IPv6 route. |
 | 2026-08-09 | Disabled asyncpg statement caching (`statement_cache_size=0`, `prepared_statement_cache_size=0`) in `database.py` and `alembic/env.py`. | Supabase transaction pooler does not support asyncpg prepared statements (`DuplicatePreparedStatementError`). |
 | 2026-08-09 | Pinned `bcrypt==4.0.1` in `requirements.txt`. | `passlib 1.7.4` is incompatible with `bcrypt>=4.1` (removed `__about__`), crashing register with 500. |
-| 2026-08-11 | Deleted the stray empty `frontend/src/context/AuthContext.js` (duplicate of `AuthContext.jsx`); it was shadowing the real module and broke every extension-less `from '../context/AuthContext'` import, failing the Vite build. | Discovered while building/testing `DashboardPage.jsx`; both files were tracked from the initial scaffold commit. |
-| 2026-08-11 | Added minimal "Coming soon" placeholder default exports to `HistoryPage.jsx`, `NewAssessmentPage.jsx`, `ResultPage.jsx` (previously empty files). | `App.jsx` statically imports every page, so the empty files blocked the whole app from building/booting even to test `DashboardPage.jsx`. Not real implementations — still pending in Phases 2-5. |
