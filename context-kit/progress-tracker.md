@@ -45,18 +45,17 @@
 ---
 ## Phase 3 — Prolog Diagnosis Engine
 ### Prolog
-- [ ] SWI-Prolog installed locally
-- [ ] `knowledge_base.pl` created with all 6 conditions
-- [ ] KB tested manually in SWI-Prolog REPL
+- [x] SWI-Prolog installed locally (10.0.2, on PATH)
+- [x] `knowledge_base.pl` created with all 6 conditions
+- [x] KB tested manually in SWI-Prolog REPL (single-condition, multi-condition, and no-symptom cases)
 ### Backend
-- [ ] `pyswip` installed and configured
-- [ ] `prolog_service.py` implemented
-- [ ] `Diagnosis` ORM model created
-- [ ] `Recommendation` ORM model created
-- [ ] Migration for diagnoses + recommendations tables run
-- [ ] `assessment_service.py` fully implemented (Prolog orchestration)
-- [ ] `AssessmentResponse` Pydantic schema created
-- [ ] `POST /assessments/` wired to full service
+- [x] `prolog_service.py` implemented — **subprocess-based** (pyswip skipped: not request-isolated for concurrent async requests, and flaky on Windows per `library-docs.md`'s own caveat)
+- [x] `Diagnosis` ORM model created
+- [x] `Recommendation` ORM model created
+- [x] Migration for diagnoses + recommendations tables run
+- [x] `assessment_service.py` fully implemented (Prolog orchestration)
+- [x] `AssessmentResponse` Pydantic schema created (nested `diagnoses[].recommendations[]`)
+- [x] `POST /assessments/` wired to full service
 ### Frontend
 - [ ] `ResultPage.jsx` built
 - [x] `RiskBadge.jsx` component built
@@ -67,15 +66,16 @@
 ## Phase 4 — Photo Upload & CV Integration
 ### Backend
 - [x] `uploads/` directory structure created
-- [x] `image_utils.py` implemented (validation + save)
+- [x] `image_utils.py` implemented (validation + save) — reused as-is per-photo for Phase 3D, no changes needed
 - [x] `cv_service.py` implemented (HuggingFace API call)
 - [x] CV label → symptom key mapping implemented
 - [x] CV results integrated into `assessment_service.py`
 - [x] Graceful fallback on `CV_SERVICE_UNAVAILABLE`
+- [x] **Phase 3D**: upgraded from single photo to `photos: {front, upper, lower}` — CV runs per-image, detected symptoms unioned across all 3 before the Prolog query; a per-image `CV_SERVICE_UNAVAILABLE` no longer drops the other images' results
 ### Frontend
 - [x] `PhotoUpload.jsx` component built
 - [x] Photo upload added to Step 4
-- [x] Base64 encoding of photo in payload working
+- [x] Base64 encoding of photo in payload working — updated to send `photos: {front, upper: null, lower: null}` after the Phase 3D schema rename
 ---
 ## Phase 5 — History & Dashboard
 ### Backend
@@ -116,3 +116,9 @@
 | 2026-08-11 | `PhotoUpload.jsx` emits the full `data:` URI to the page; `NewAssessmentPage.jsx` strips the prefix and sends raw base64 as `photo_base64`. | Backend `decode_base64_image` also accepts the `data:` URI, but raw base64 keeps the payload minimal. |
 | 2026-08-11 | Ran the previously-pending `c243bf08b89a_create_assessments_and_symptom_` migration against the live Supabase DB (`alembic upgrade head`). | The DB was unreachable in the session that wrote the migration; this session's `.env` reaches it fine, and applying it was required to test the CV/photo work end-to-end. User confirmed before running. |
 | 2026-08-11 | `CVServiceUnavailableError` (plain `Exception`, not `HTTPException`) is caught inside `assessment_service.create()` and never surfaces to the client — `image_analysis_result` is set to `{"status": "CV_SERVICE_UNAVAILABLE"}` and the assessment still saves with symptom-only data. | Photo is optional; a CV outage must not fail assessment submission (Phase 4 requirement: "Handle CV_SERVICE_UNAVAILABLE gracefully"). Verified live: real HF call fails against the placeholder `.env` token and the fallback path saves correctly (HTTP 201). |
+| 2026-08-15 | Discovered at the start of Phase 3D that Phase 3 (Prolog engine) was never actually built despite Phase 4 being checked off — `assessment_service.create()` returned a hardcoded `RiskLevel.LOW` stub, and `prolog_service.py`/`knowledge_base.pl` didn't exist. Built Phase 3 as a prerequisite (KB copied verbatim from `prolog-kb.md`, fully pre-specified — no new clinical logic invented) since the Phase 3D deliverable explicitly requires "a real diagnosis." | AGENTS.md rule 8 ("ask if uncertain") was weighed against the fact that every line of the KB was already fully specified in the docs — implementing it was mechanical, not a design decision, and skipping it would leave the stated deliverable unmet. |
+| 2026-08-15 | `prolog_service.py` uses **subprocess** (`swipl` CLI), not `pyswip`, despite `pyswip` being architecture.md's preferred option. | `pyswip`'s embedded engine is a single global interpreter per process — not isolated per request, so concurrent async requests would race on asserted `symptom/1` facts. `library-docs.md` itself documents subprocess as the Windows fallback; this dev machine is Windows. |
+| 2026-08-15 | `knowledge_base.pl` gained a `report/0` helper (dedupes matched conditions via `sort/2`, picks the highest-severity `risk_level/2`/`explanation/2` per condition via `once/1`) and explicit `set_prolog_flag(encoding, utf8)` / `set_stream(user_output, encoding(utf8))` directives. | Manual REPL testing surfaced two real bugs: (1) naive `possible(C), risk_level(C,R)` backtracking produced duplicate/contradictory risk rows per condition — confirmed via `swipl` before writing any Python; (2) SWI-Prolog on Windows defaults to the system codepage for both file reads and stdout writes, silently mangling the em dashes in `explanation/2` texts into mojibake — confirmed by inspecting raw output bytes, not just terminal display (which itself misrenders correct UTF-8). |
+| 2026-08-15 | `assessments.photo_url VARCHAR(500)` replaced with `photo_urls JSONB` (`{"front", "upper", "lower"}`, each nullable); `image_analysis_result` keeps its JSONB type but now holds one CV result per angle instead of one overall. Migration drops the old column outright rather than migrating existing values. | Phase 3D's guided capture produces up to 3 photos, not 1. Dropping instead of migrating `photo_url` is acceptable pre-launch — no production assessment data exists yet that depends on it. |
+| 2026-08-15 | `diagnoses.triggered_rules` is populated as `["possible(<condition>)", "risk_level(<condition>, <risk>)"]` — the two predicate calls that succeeded — rather than deeper per-clause provenance. | `report/0` reports the winning risk level via `once/1`, not which specific clause matched; `api-standards.md`'s own example (`"needs_dentist(dental_cavity)"`) isn't a real predicate in the KB either, confirming the field is meant as an illustrative rule-name list rather than exact clause introspection. Deeper instrumentation (naming every clause) was out of scope for Phase 3D. |
+| 2026-08-15 | `NewAssessmentPage.jsx`'s single optional photo now maps to `photos.front` (with `upper`/`lower` sent as `null`) instead of the removed `photo_base64` field. | Required to avoid breaking the existing static-questionnaire photo upload when the schema field was renamed per Phase 3D's explicit instruction. |

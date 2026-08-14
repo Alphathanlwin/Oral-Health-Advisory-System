@@ -153,13 +153,13 @@ TOOTH_SENSITIVITY
  Enum: LOW / MEDIUM / HIGH                    
 |
 |
- photo_url             
+ photo_urls            
 |
- VARCHAR(500)  
+ JSONB         
 |
  NULLABLE                      
 |
- Path to uploaded image file                  
+ `{"front": "uploads/....jpg", "upper": null, "lower": null}` — each of the 3 guided-capture angles is independently optional (Phase 3D; replaced the single `photo_url VARCHAR` column) 
 |
 |
  image_analysis_result 
@@ -168,7 +168,7 @@ TOOTH_SENSITIVITY
 |
  NULLABLE                      
 |
- Raw CV API response stored as JSON           
+ `{"front": <HF response or `{"status":"CV_SERVICE_UNAVAILABLE"}`>, "upper": ..., "lower": ...}` — per-angle raw CV result           
 |
 |
  created_at            
@@ -393,7 +393,7 @@ class Assessment(Base):
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     risk_level: Mapped[RiskLevel] = mapped_column(SAEnum(RiskLevel), nullable=False)
-    photo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    photo_urls: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     image_analysis_result: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     # Relationships
     user: Mapped["User"] = relationship(back_populates="assessments")

@@ -40,7 +40,10 @@ function NewAssessmentPage() {
 
     try {
       const photoBase64 = photo && photo.includes(',') ? photo.split(',')[1] : null;
-      const response = await createAssessment({ symptoms, photo_base64: photoBase64 });
+      const response = await createAssessment({
+        symptoms,
+        photos: { front: photoBase64, upper: null, lower: null },
+      });
       if (response.success && response.data) {
         navigate(`/assessment/${response.data.id}/result`);
       }

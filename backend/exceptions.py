@@ -54,3 +54,14 @@ class ImageTooLargeException(HTTPException):
                 "message": "Image exceeds the 5 MB size limit.",
             },
         )
+
+
+class PrologEngineErrorException(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=500,
+            detail={
+                "code": "PROLOG_ENGINE_ERROR",
+                "message": "The diagnosis engine failed to process this assessment.",
+            },
+        )

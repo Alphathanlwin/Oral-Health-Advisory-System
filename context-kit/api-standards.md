@@ -143,11 +143,15 @@ Submit a new symptom assessment (with optional photo).
     "brushes_twice_daily": true,
     "sugary_diet": true
   },
-  "photo_base64": null
+  "photos": {
+    "front": null,
+    "upper": null,
+    "lower": null
+  }
 }
 ```
 > Note: `symptoms` object must include all symptom keys defined in `database-schema.md`.
-> `photo_base64` is optional. If provided, it is a base64-encoded JPEG/PNG/WEBP image.
+> `photos` (Phase 3D; replaced the single `photo_base64` field) has three independently optional/nullable slots — `front`, `upper`, `lower` — matching the guided capture flow. Any subset may be provided; each present value is a base64-encoded (optionally `data:`-URI-prefixed) JPEG/PNG/WEBP image. CV-detected symptoms are unioned across whichever photos are present before the Prolog query runs.
 **Response `201 Created`**
 ```json
 {
