@@ -67,10 +67,16 @@ function DashboardPage() {
             Your oral health at a glance — run a quick assessment or review your latest results.
           </p>
         </div>
-        <button className="dashboard-cta" onClick={() => navigate('/assessment/new')}>
-          <PlusIcon />
-          Start New Assessment
-        </button>
+        <div className="dashboard-cta-group">
+          <button className="dashboard-cta dashboard-cta--live" onClick={() => navigate('/assessment/live')}>
+            <SparkleIcon />
+            Live AI Screening
+          </button>
+          <button className="dashboard-cta" onClick={() => navigate('/assessment/new')}>
+            <PlusIcon />
+            Start New Assessment
+          </button>
+        </div>
       </div>
 
       <div className="stats-row">
@@ -156,6 +162,19 @@ function DashboardPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function SparkleIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M8 1.5l1.2 3.8L13 6.5l-3.8 1.2L8 11.5l-1.2-3.8L3 6.5l3.8-1.2L8 1.5z"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 
