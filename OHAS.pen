@@ -14076,54 +14076,6 @@
         },
         {
           "type": "frame",
-          "id": "I7L9Y",
-          "name": "Step 3a",
-          "width": 390,
-          "gap": 8,
-          "padding": [
-            10,
-            0
-          ],
-          "justifyContent": "center",
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "frame",
-              "id": "KhcR3",
-              "name": "Num",
-              "width": 22,
-              "height": 22,
-              "fill": "#0EA5E926",
-              "cornerRadius": 11,
-              "justifyContent": "center",
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "text",
-                  "id": "hN4Py",
-                  "name": "N",
-                  "fill": "$accent",
-                  "content": "3a",
-                  "fontFamily": "$font-body",
-                  "fontSize": 11,
-                  "fontWeight": "700"
-                }
-              ]
-            },
-            {
-              "type": "text",
-              "id": "WmLam",
-              "name": "Label",
-              "fill": "$text",
-              "content": "Front bite",
-              "fontFamily": "$font-heading",
-              "fontSize": 15,
-              "fontWeight": "600"
-            }
-          ]
-        },
-        {
-          "type": "frame",
           "id": "LxoQd",
           "name": "Transition",
           "width": 80,
@@ -14820,6 +14772,56 @@
               "fontWeight": "normal"
             }
           ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "I7L9Y",
+      "x": 12660,
+      "y": 1608,
+      "name": "Step 3a",
+      "width": 390,
+      "gap": 8,
+      "padding": [
+        10,
+        0
+      ],
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "KhcR3",
+          "name": "Num",
+          "width": 22,
+          "height": 22,
+          "fill": "#0EA5E926",
+          "cornerRadius": 11,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "hN4Py",
+              "name": "N",
+              "fill": "$accent",
+              "content": "3a",
+              "fontFamily": "$font-body",
+              "fontSize": 11,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "WmLam",
+          "name": "Label",
+          "fill": "$text",
+          "content": "Front bite",
+          "fontFamily": "$font-heading",
+          "fontSize": 15,
+          "fontWeight": "600"
         }
       ]
     }

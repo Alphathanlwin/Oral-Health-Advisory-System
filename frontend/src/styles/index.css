@@ -1682,6 +1682,32 @@ button {
   opacity: 0.55;
 }
 
+.live-camera-video {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+video.live-camera-video {
+  transform: scaleX(-1);
+}
+
+.live-camera-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
 .live-camera-top {
   position: relative;
   z-index: 5;
@@ -1702,6 +1728,8 @@ button {
 }
 
 .live-mouth-guide {
+  position: relative;
+  z-index: 2;
   width: 300px;
   max-width: 78%;
   margin-top: 56px;
@@ -1715,12 +1743,15 @@ button {
 }
 
 .live-guide-hint {
+  position: relative;
+  z-index: 2;
   margin-top: 14px;
   font-size: 0.8125rem;
   font-weight: 500;
   color: rgba(241, 245, 249, 0.85);
   text-align: center;
   padding: 0 32px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 .live-ava-float {
@@ -1784,6 +1815,12 @@ button {
   transform: scale(0.92);
 }
 
+.live-shutter:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 .live-shutter-core {
   width: 62px;
   height: 62px;
@@ -1794,6 +1831,40 @@ button {
 .live-capture-hint {
   font-size: 0.75rem;
   color: var(--color-text-muted);
+  text-align: center;
+}
+
+.live-confirm-row {
+  width: 100%;
+  display: flex;
+  gap: 14px;
+}
+
+.live-confirm-btn {
+  flex: 1;
+  height: 58px;
+  padding: 0;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.live-confirm-btn--retake {
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.live-confirm-btn--use {
+  background: var(--color-primary);
+  border: none;
+  color: #04121f;
+  box-shadow: 0 8px 24px -6px rgba(14, 165, 233, 0.4);
 }
 
 /* --- Analyzing -------------------------------------------------------------- */
@@ -1833,6 +1904,14 @@ button {
 
 .live-thumb-photo--queued {
   opacity: 0.45;
+}
+
+.live-thumb-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .live-thumb-scanline {
