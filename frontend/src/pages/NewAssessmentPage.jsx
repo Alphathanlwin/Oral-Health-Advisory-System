@@ -3,68 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createAssessment } from '../api/assessment';
 import SymptomToggle from '../components/SymptomToggle';
 import PhotoUpload from '../components/PhotoUpload';
-
-const STEPS = [
-  {
-    id: 1,
-    label: 'Pain & Sensitivity',
-    title: 'Pain & Sensitivity',
-    description: "Let us know about any pain or sensitivity you've been experiencing.",
-    symptoms: [
-      { key: 'cold_sensitivity', label: 'Cold sensitivity', hint: 'Pain when drinking cold liquids' },
-      { key: 'hot_sensitivity', label: 'Hot sensitivity', hint: 'Pain when drinking hot liquids' },
-      { key: 'pressure_pain', label: 'Pain when biting', hint: 'Pain when biting or chewing' },
-      { key: 'spontaneous_pain', label: 'Spontaneous pain', hint: 'Pain without any trigger' },
-    ],
-  },
-  {
-    id: 2,
-    label: 'Gum & Appearance',
-    title: 'Gum & Appearance',
-    description: 'Tell us about your gums and any visible spots, patches or discoloration you have noticed.',
-    symptoms: [
-      { key: 'bleeding_gums', label: 'Bleeding gums', hint: 'Slight bleeding when brushing' },
-      { key: 'swollen_gums', label: 'Swollen gums', hint: 'Puffy or tender gum tissue' },
-      { key: 'receding_gums', label: 'Receding gums', hint: 'Gums pulling away from teeth' },
-      { key: 'black_spot', label: 'Black or brown spot', hint: 'Visible dark spot on a tooth' },
-      { key: 'white_spot', label: 'White spot or patch', hint: 'Chalky white area on enamel' },
-      { key: 'yellow_staining', label: 'Yellow staining', hint: 'Surface discoloration' },
-    ],
-  },
-  {
-    id: 3,
-    label: 'Mouth & Habits',
-    title: 'Mouth & Habits',
-    description: 'Tell us about your breath, any sores, and how your teeth feel.',
-    symptoms: [
-      { key: 'bad_breath', label: 'Bad breath', hint: 'Persistent bad breath' },
-      { key: 'dry_mouth', label: 'Dry mouth', hint: 'Mouth feels dry most of the time' },
-      { key: 'mouth_ulcer', label: 'Mouth ulcer', hint: 'Sore lesion inside mouth' },
-      { key: 'burning_sensation', label: 'Burning sensation', hint: 'Burning feeling in mouth' },
-      { key: 'loose_tooth', label: 'Loose tooth', hint: 'Tooth feels loose' },
-      { key: 'broken_tooth', label: 'Broken tooth', hint: 'Visible crack or broken piece' },
-    ],
-  },
-  {
-    id: 4,
-    label: 'Hygiene & Photo',
-    title: 'Hygiene & Photo',
-    description: 'Tell us about your daily hygiene habits. Photo upload is optional.',
-    symptoms: [
-      { key: 'brushes_twice_daily', label: 'Brushes twice daily', hint: 'Brushes at least twice per day' },
-      { key: 'uses_floss', label: 'Uses floss', hint: 'Uses dental floss regularly' },
-      { key: 'sugary_diet', label: 'Sugary diet', hint: 'High sugar intake in daily diet' },
-      { key: 'acid_exposure', label: 'Acid exposure', hint: 'Frequent consumption of acidic drinks' },
-    ],
-  },
-];
-
-const initialSymptoms = STEPS.reduce((acc, step) => {
-  step.symptoms.forEach((s) => {
-    acc[s.key] = false;
-  });
-  return acc;
-}, {});
+import { SYMPTOM_STEPS as STEPS, initialSymptoms } from '../data/symptomQuestions';
 
 function NewAssessmentPage() {
   const [stepIndex, setStepIndex] = useState(0);

@@ -1,18 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AiGuide from '../components/AiGuide';
-
-// Dummy question bank — mirrors the vocabulary used in NewAssessmentPage so the
-// live flow feels consistent, but answers aren't sent anywhere yet (Phase 3A
-// is frontend-only: no camera, no API calls).
-const QUESTIONS = [
-  { key: 'cold_sensitivity', text: 'Do you feel pain when drinking something cold?', hint: 'Even a quick twinge counts.' },
-  { key: 'bleeding_gums', text: 'Do your gums bleed when you brush?', hint: 'Even a little pink in the sink counts.' },
-  { key: 'bad_breath', text: "Have you noticed persistent bad breath?", hint: 'Even after brushing.' },
-  { key: 'loose_tooth', text: 'Does any tooth feel loose?', hint: "Even slightly, when you press it with your tongue." },
-  { key: 'dry_mouth', text: 'Does your mouth feel dry most of the time?', hint: 'Not just after waking up.' },
-  { key: 'mouth_ulcer', text: 'Do you have any sores inside your mouth?', hint: 'Anywhere on the cheeks, tongue or gums.' },
-];
+import ProgressDots from '../components/ProgressDots';
+import SymptomVoiceStep from '../components/SymptomVoiceStep';
+import { SYMPTOM_QUESTIONS } from '../data/symptomQuestions';
 
 const CAPTURE_ANGLES = [
   { id: 'capture_front', label: 'Front bite', hint: 'Bite together gently and fill the outline', caption: 'Smile wide so I can see your front teeth.', shape: 'bite' },
@@ -31,8 +22,7 @@ function LiveScreeningPage() {
   const navigate = useNavigate();
 
   const [screen, setScreen] = useState('intro');
-  const [symptomIndex, setSymptomIndex] = useState(0);
-  const [confirming, setConfirming] = useState(false);
+  const [symptoms, setSymptoms] = useState(null);
   const [captured, setCaptured] = useState([false, false, false]);
   const [flash, setFlash] = useState(false);
   const [percent, setPercent] = useState(0);
@@ -47,9 +37,6 @@ function LiveScreeningPage() {
   if (screen === 'intro') {
     pose = 'idle';
     caption = "Hi, I'm Dr. Ava. Let's do a quick smile check together.";
-  } else if (screen === 'ask_symptoms') {
-    pose = confirming ? 'great_job' : 'idle';
-    caption = confirming ? 'Got it, thanks!' : 'Just tell me yes or no — there are no wrong answers.';
   } else if (captureIndex !== -1) {
     pose = 'look_here';
     caption = CAPTURE_ANGLES[captureIndex].caption;
@@ -60,6 +47,12 @@ function LiveScreeningPage() {
     pose = 'reveal';
     caption = RESULT.summary;
   }
+
+  // Collected here so the exact payload shape (matching NewAssessmentPage's
+  // symptoms{}) can be inspected until a later phase wires it to the API.
+  useEffect(() => {
+    if (symptoms) console.info('[LiveScreening] collected symptoms', symptoms);
+  }, [symptoms]);
 
   // --- analyzing auto-progress ----------------------------------------------------
   useEffect(() => {
@@ -83,16 +76,9 @@ function LiveScreeningPage() {
 
   const handleStart = () => setScreen('ask_symptoms');
 
-  const handleAnswer = () => {
-    setConfirming(true);
-    setTimeout(() => {
-      setConfirming(false);
-      if (symptomIndex < QUESTIONS.length - 1) {
-        setSymptomIndex((i) => i + 1);
-      } else {
-        setScreen('capture_front');
-      }
-    }, 650);
+  const handleSymptomsComplete = (collected) => {
+    setSymptoms(collected);
+    setScreen('capture_front');
   };
 
   const handleCapture = () => {
@@ -112,7 +98,7 @@ function LiveScreeningPage() {
 
   const handleRetake = () => {
     setScreen('intro');
-    setSymptomIndex(0);
+    setSymptoms(null);
     setCaptured([false, false, false]);
     setPercent(0);
   };
@@ -125,17 +111,7 @@ function LiveScreeningPage() {
 
       {screen === 'intro' && <IntroScreen pose={pose} caption={caption} onStart={handleStart} />}
 
-      {screen === 'ask_symptoms' && (
-        <SymptomScreen
-          pose={pose}
-          caption={caption}
-          question={QUESTIONS[symptomIndex]}
-          index={symptomIndex}
-          total={QUESTIONS.length}
-          disabled={confirming}
-          onAnswer={handleAnswer}
-        />
-      )}
+      {screen === 'ask_symptoms' && <SymptomVoiceStep onComplete={handleSymptomsComplete} />}
 
       {captureIndex !== -1 && (
         <CaptureScreen
@@ -175,38 +151,7 @@ function IntroScreen({ pose, caption, onStart }) {
         <ArrowIcon />
       </button>
 
-      <p className="live-footnote">Takes about 2 minutes · {QUESTIONS.length} questions · 3 photos</p>
-    </div>
-  );
-}
-
-function SymptomScreen({ pose, caption, question, index, total, disabled, onAnswer }) {
-  return (
-    <div className="live-content">
-      <div className="live-guide-row">
-        <AiGuide state={pose} caption={caption} size="sm" layout="float" />
-      </div>
-
-      <div className="live-question-card">
-        <div className="live-icon-badge">
-          <DropletIcon />
-        </div>
-        <h2 className="live-question-text">{question.text}</h2>
-        <p className="live-question-hint">{question.hint}</p>
-      </div>
-
-      <div className="live-answers">
-        <button type="button" className="live-answer-btn live-answer-btn--yes" disabled={disabled} onClick={onAnswer}>
-          <CheckIcon />
-          Yes
-        </button>
-        <button type="button" className="live-answer-btn live-answer-btn--no" disabled={disabled} onClick={onAnswer}>
-          <XIcon />
-          No
-        </button>
-      </div>
-
-      <ProgressDots total={total} current={index} />
+      <p className="live-footnote">Takes about 2 minutes · {SYMPTOM_QUESTIONS.length} questions · 3 photos</p>
     </div>
   );
 }
@@ -330,19 +275,6 @@ function RevealScreen({ pose, caption, onDone, onRetake }) {
   );
 }
 
-function ProgressDots({ total, current }) {
-  return (
-    <div className="live-dots">
-      {Array.from({ length: total }).map((_, i) => (
-        <span
-          key={i}
-          className={`live-dot ${i === current ? 'live-dot--current' : i < current ? 'live-dot--done' : ''}`}
-        ></span>
-      ))}
-    </div>
-  );
-}
-
 function MouthGuide({ shape }) {
   const path =
     shape === 'upper'
@@ -385,22 +317,6 @@ function ArrowIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M7 2.5l4.5 4.5L7 11.5M2 7h9.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M2.5 7.5l3 3 6-6.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function DropletIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 3s7 7.5 7 12a7 7 0 1 1-14 0c0-4.5 7-12 7-12z" stroke="#0ea5e9" strokeWidth="1.6" strokeLinejoin="round" />
     </svg>
   );
 }
