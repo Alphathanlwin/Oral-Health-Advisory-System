@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+// Relative, not an absolute host:port — Vite's dev server proxies /api to the
+// backend (see vite.config.js), so this works identically whether the page
+// was opened via localhost or a phone on the LAN via the dev machine's IP.
+const API_BASE_URL = '/api/v1';
 
 const authApi = axios.create({
   baseURL: API_BASE_URL,

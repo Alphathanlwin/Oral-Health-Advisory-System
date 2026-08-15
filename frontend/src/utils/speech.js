@@ -1,8 +1,12 @@
-// Thin wrapper around the Web Speech API's SpeechSynthesis.
-// Falls back to a timed no-op when the browser has no TTS support, so callers
-// (talking-mouth animation, auto-advance timers) still get onStart/onEnd.
+// Dr. Ava's voice. Tries the real neural TTS backend first (ElevenLabs, via
+// POST /api/v1/tts) and falls back to the browser's built-in SpeechSynthesis
+// if that's unavailable (no key configured server-side, network error, etc.)
+// — callers only ever see the same onStart/onEnd contract either way.
+import apiClient from '../api/auth';
 
-function pickVoice() {
+let currentAudio = null;
+
+function pickSystemVoice() {
   if (typeof window === 'undefined' || !window.speechSynthesis) return null;
   const voices = window.speechSynthesis.getVoices();
   return (
@@ -13,7 +17,7 @@ function pickVoice() {
   );
 }
 
-export function speak(text, { onStart, onEnd, rate = 1, pitch = 1.05, volume = 1 } = {}) {
+function speakWithSystemVoice(text, { onStart, onEnd, rate, pitch, volume }) {
   const hasSpeech = typeof window !== 'undefined' && 'speechSynthesis' in window;
 
   if (!hasSpeech || !text) {
@@ -30,7 +34,7 @@ export function speak(text, { onStart, onEnd, rate = 1, pitch = 1.05, volume = 1
   utterance.pitch = pitch;
   utterance.volume = volume;
 
-  const voice = pickVoice();
+  const voice = pickSystemVoice();
   if (voice) utterance.voice = voice;
 
   utterance.onstart = () => onStart?.();
@@ -42,7 +46,64 @@ export function speak(text, { onStart, onEnd, rate = 1, pitch = 1.05, volume = 1
   return { cancel: () => window.speechSynthesis.cancel() };
 }
 
+export function speak(text, { onStart, onEnd, rate = 1, pitch = 1.05, volume = 1 } = {}) {
+  if (!text) {
+    onStart?.();
+    onEnd?.();
+    return { cancel: () => {} };
+  }
+
+  let cancelled = false;
+  let fallbackHandle = null;
+
+  apiClient
+    .post('/tts/', { text }, { responseType: 'blob' })
+    .then((response) => {
+      if (cancelled) return;
+
+      const url = URL.createObjectURL(response.data);
+      const audio = new Audio(url);
+      audio.volume = volume;
+      currentAudio = audio;
+
+      const cleanup = () => {
+        URL.revokeObjectURL(url);
+        if (currentAudio === audio) currentAudio = null;
+      };
+
+      audio.onplay = () => onStart?.();
+      audio.onended = () => {
+        onEnd?.();
+        cleanup();
+      };
+      audio.onerror = () => {
+        onEnd?.();
+        cleanup();
+      };
+
+      audio.play().catch(() => {
+        onEnd?.();
+        cleanup();
+      });
+    })
+    .catch(() => {
+      if (!cancelled) fallbackHandle = speakWithSystemVoice(text, { onStart, onEnd, rate, pitch, volume });
+    });
+
+  return {
+    cancel: () => {
+      cancelled = true;
+      currentAudio?.pause();
+      currentAudio = null;
+      fallbackHandle?.cancel();
+      if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
+    },
+  };
+}
+
 export function stopSpeaking() {
+  currentAudio?.pause();
+  currentAudio = null;
   if (typeof window !== 'undefined' && window.speechSynthesis) {
     window.speechSynthesis.cancel();
   }

@@ -65,3 +65,14 @@ class PrologEngineErrorException(HTTPException):
                 "message": "The diagnosis engine failed to process this assessment.",
             },
         )
+
+
+class TTSServiceUnavailableException(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=503,
+            detail={
+                "code": "TTS_SERVICE_UNAVAILABLE",
+                "message": "The voice service is temporarily unavailable.",
+            },
+        )
