@@ -3,15 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import AiGuide from '../components/AiGuide';
 import SymptomVoiceStep from '../components/SymptomVoiceStep';
 import GuidedCapture from '../components/GuidedCapture';
+import { createAssessment } from '../api/assessment';
+import { buildResultSummary } from '../utils/resultSummary';
 import { SYMPTOM_QUESTIONS } from '../data/symptomQuestions';
 import { CAPTURE_ANGLES } from '../data/captureAngles';
 
-const RESULT = {
-  riskLevel: 'medium',
-  score: 62,
-  summary:
-    "I spotted early gum inflammation and some plaque along the gumline. Nothing urgent — but worth acting on soon.",
-};
+const stripDataUrlPrefix = (dataUrl) => (dataUrl && dataUrl.includes(',') ? dataUrl.split(',')[1] : null);
 
 function LiveScreeningPage() {
   const navigate = useNavigate();
@@ -20,6 +17,8 @@ function LiveScreeningPage() {
   const [symptoms, setSymptoms] = useState(null);
   const [photos, setPhotos] = useState(null);
   const [percent, setPercent] = useState(0);
+  const [assessment, setAssessment] = useState(null);
+  const [submitError, setSubmitError] = useState('');
   const analyzeTimer = useRef(null);
 
   // --- caption + pose per screen -------------------------------------------------
@@ -34,37 +33,67 @@ function LiveScreeningPage() {
     caption = 'Give me a moment while I take a look...';
   } else if (screen === 'reveal') {
     pose = 'reveal';
-    caption = RESULT.summary;
+    caption = buildResultSummary(assessment);
+  } else if (screen === 'error') {
+    pose = 'sorry';
+    caption = "Sorry, something went wrong while I was analyzing your smile. Let's try that again.";
   }
 
-  // Collected here so the exact payload shapes (matching NewAssessmentPage's
-  // symptoms{} and photo_base64) can be inspected until a later phase wires
-  // them to the API — front end now produces real symptoms{} + photos{}.
+  // --- submit the real assessment once both symptoms + photos are collected ------
   useEffect(() => {
-    if (symptoms) console.info('[LiveScreening] collected symptoms', symptoms);
-  }, [symptoms]);
+    if (screen !== 'analyzing' || !symptoms || !photos) return undefined;
 
-  useEffect(() => {
-    if (photos) console.info('[LiveScreening] collected photos', photos);
-  }, [photos]);
+    let cancelled = false;
 
-  // --- analyzing auto-progress ----------------------------------------------------
+    createAssessment({
+      symptoms,
+      photos: {
+        front: stripDataUrlPrefix(photos.front),
+        upper: stripDataUrlPrefix(photos.upper),
+        lower: stripDataUrlPrefix(photos.lower),
+      },
+    })
+      .then((response) => {
+        if (cancelled) return;
+        if (response.success && response.data) {
+          setAssessment(response.data);
+        } else {
+          setSubmitError('Something went wrong while analyzing your smile.');
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setSubmitError('Something went wrong while analyzing your smile.');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [screen, symptoms, photos]);
+
+  // --- analyzing visual progress: climbs on its own, holds near-done until ------
+  // the real API response actually lands (or fails)
   useEffect(() => {
     if (screen !== 'analyzing') return undefined;
 
     analyzeTimer.current = setInterval(() => {
-      setPercent((p) => {
-        if (p >= 100) {
-          clearInterval(analyzeTimer.current);
-          setTimeout(() => setScreen('reveal'), 350);
-          return 100;
-        }
-        return p + 4;
-      });
+      setPercent((p) => (p >= 96 ? p : p + 4));
     }, 90);
 
     return () => clearInterval(analyzeTimer.current);
   }, [screen]);
+
+  useEffect(() => {
+    if (screen !== 'analyzing' || (!assessment && !submitError)) return undefined;
+
+    clearInterval(analyzeTimer.current);
+
+    const timeout = setTimeout(() => {
+      setPercent(100);
+      setScreen(assessment ? 'reveal' : 'error');
+    }, 350);
+
+    return () => clearTimeout(timeout);
+  }, [screen, assessment, submitError]);
 
   const handleExit = () => navigate('/');
 
@@ -85,6 +114,12 @@ function LiveScreeningPage() {
     setSymptoms(null);
     setPhotos(null);
     setPercent(0);
+    setAssessment(null);
+    setSubmitError('');
+  };
+
+  const handleViewResults = () => {
+    navigate(`/assessment/${assessment.id}/result`, { state: { assessment } });
   };
 
   return (
@@ -102,8 +137,10 @@ function LiveScreeningPage() {
       {screen === 'analyzing' && <AnalyzingScreen pose={pose} caption={caption} percent={percent} photos={photos} />}
 
       {screen === 'reveal' && (
-        <RevealScreen pose={pose} caption={caption} onDone={() => navigate('/')} onRetake={handleRetake} />
+        <RevealScreen pose={pose} caption={caption} assessment={assessment} onViewResults={handleViewResults} onRetake={handleRetake} />
       )}
+
+      {screen === 'error' && <ErrorScreen pose={pose} caption={caption} onRetry={handleRetake} onExit={handleExit} />}
     </div>
   );
 }
@@ -170,42 +207,52 @@ function AnalyzingScreen({ pose, caption, percent, photos }) {
   );
 }
 
-function RevealScreen({ pose, caption, onDone, onRetake }) {
+function RevealScreen({ pose, caption, assessment, onViewResults, onRetake }) {
+  const riskLevel = (assessment?.risk_level || 'LOW').toUpperCase();
+  const diagnosisCount = assessment?.diagnoses?.length || 0;
+
   return (
     <div className="live-content live-content--center">
       <div className="live-reveal-stage">
         <AiGuide state={pose} caption={caption} size="md" layout="stage" />
-        <div className="live-risk-badge">
+        <div className={`live-risk-badge live-risk-badge--${riskLevel.toLowerCase()}`}>
           <ShieldIcon />
-          {RESULT.riskLevel.toUpperCase()} RISK
+          {riskLevel} RISK
         </div>
       </div>
 
       <h1 className="live-title live-title--sm">Here&apos;s what I found</h1>
 
-      <div className="live-meter">
-        <div className="live-meter-head">
-          <span>Smile score</span>
-          <span className="live-meter-score">{RESULT.score} / 100</span>
-        </div>
-        <div className="live-meter-segments">
-          <span className="live-segment live-segment--low"></span>
-          <span className="live-segment live-segment--medium"></span>
-          <span className="live-segment live-segment--empty"></span>
-        </div>
-        <div className="live-meter-legend">
-          <span>Low</span>
-          <span className="live-meter-legend--active">Medium</span>
-          <span>High</span>
-        </div>
-      </div>
+      <p className="live-footnote">
+        {diagnosisCount === 0
+          ? 'No specific conditions detected'
+          : `${diagnosisCount} condition${diagnosisCount === 1 ? '' : 's'} detected`}
+      </p>
 
-      <button type="button" className="live-btn-primary" onClick={onDone}>
+      <button type="button" className="live-btn-primary" onClick={onViewResults}>
         View full results
         <ArrowIcon />
       </button>
       <button type="button" className="live-link-btn" onClick={onRetake}>
         Retake screening
+      </button>
+    </div>
+  );
+}
+
+function ErrorScreen({ pose, caption, onRetry, onExit }) {
+  return (
+    <div className="live-content live-content--center">
+      <AiGuide state={pose} caption={caption} size="md" layout="stage" />
+
+      <h1 className="live-title live-title--sm">Let&apos;s try again</h1>
+
+      <button type="button" className="live-btn-primary" onClick={onRetry}>
+        Retry Smile Check
+        <ArrowIcon />
+      </button>
+      <button type="button" className="live-link-btn" onClick={onExit}>
+        Exit to dashboard
       </button>
     </div>
   );

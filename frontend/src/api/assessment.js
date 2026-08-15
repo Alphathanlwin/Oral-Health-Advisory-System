@@ -9,3 +9,8 @@ export const createAssessment = async (payload) => {
   const response = await apiClient.post('/assessments/', payload);
   return response.data;
 };
+
+export const getAssessment = async (id) => {
+  const response = await apiClient.get(`/assessments/${id}`);
+  return response.data;
+};

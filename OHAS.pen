@@ -10000,7 +10000,7 @@
           "fill": {
             "type": "image",
             "enabled": true,
-            "url": "./images/generated-1786722929237.png",
+            "url": "images/generated-1786722929237.png",
             "mode": "fill"
           },
           "cornerRadius": 150
@@ -10016,7 +10016,7 @@
           "fill": {
             "type": "image",
             "enabled": true,
-            "url": "./images/generated-1786722929188.png",
+            "url": "images/generated-1786722929188.png",
             "mode": "fill"
           },
           "cornerRadius": 150
@@ -10032,7 +10032,7 @@
           "fill": {
             "type": "image",
             "enabled": true,
-            "url": "./images/generated-1786722929563.png",
+            "url": "images/generated-1786722929563.png",
             "mode": "fill"
           },
           "cornerRadius": 150
@@ -10048,7 +10048,7 @@
           "fill": {
             "type": "image",
             "enabled": true,
-            "url": "./images/generated-1786722932206.png",
+            "url": "images/generated-1786722932206.png",
             "mode": "fill"
           },
           "cornerRadius": 150
@@ -11028,7 +11028,7 @@
               "fill": {
                 "type": "image",
                 "enabled": true,
-                "url": "./images/generated-1786722507386.png",
+                "url": "images/generated-1786722507386.png",
                 "mode": "fill"
               },
               "width": 390,
@@ -12853,7 +12853,7 @@
               "fill": {
                 "type": "image",
                 "enabled": true,
-                "url": "./images/generated-1786722507386.png",
+                "url": "images/generated-1786722507386.png",
                 "mode": "fill"
               },
               "width": 390,
@@ -13399,7 +13399,7 @@
               "fill": {
                 "type": "image",
                 "enabled": true,
-                "url": "./images/generated-1786722507386.png",
+                "url": "images/generated-1786722507386.png",
                 "mode": "fill"
               },
               "width": 390,
@@ -14475,7 +14475,7 @@
       "type": "frame",
       "id": "Opv1x",
       "x": 15540,
-      "y": 760,
+      "y": 745,
       "name": "Motion & Interaction Spec",
       "width": 420,
       "fill": "$bg-deep",

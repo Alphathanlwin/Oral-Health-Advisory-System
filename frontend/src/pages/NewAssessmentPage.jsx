@@ -45,7 +45,7 @@ function NewAssessmentPage() {
         photos: { front: photoBase64, upper: null, lower: null },
       });
       if (response.success && response.data) {
-        navigate(`/assessment/${response.data.id}/result`);
+        navigate(`/assessment/${response.data.id}/result`, { state: { assessment: response.data } });
       }
     } catch (err) {
       const message =
