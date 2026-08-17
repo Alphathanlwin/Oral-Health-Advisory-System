@@ -62,6 +62,31 @@ npm run dev -- --host 0.0.0.0
 
 The frontend runs at `https://localhost:5173` and can be reached from a phone on the same network using the machine's LAN IP.
 
+## Phone Access (yours or a friend's)
+
+Anyone on the **same Wi-Fi network** as this machine — you or a friend — can open the app on their phone once both servers above are running:
+
+```text
+https://172.20.11.222:5173
+```
+
+> This is this machine's current Wi-Fi IP — it can change (different network,
+> reconnecting, DHCP lease renewal). Get the current one with:
+>
+> ```powershell
+> Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias "Wi-Fi" | Select-Object IPAddress
+> ```
+>
+> No code change needed when it does — the dev cert (`vite.config.js`) is
+> generated fresh on every server start and automatically covers whatever
+> LAN IP(s) the machine currently has.
+
+**First time on each phone:** the browser will warn that the connection isn't
+private (it's a self-signed dev certificate, not a public browser-trusted
+one). This is expected — tap **Advanced → proceed anyway** (Android
+Chrome) or the equivalent option on your browser. Each phone needs to do
+this once; after that it won't ask again for that address.
+
 ## Demo and test flow
 
 - Register or log in using the auth UI.
