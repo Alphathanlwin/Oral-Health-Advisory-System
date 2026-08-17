@@ -209,6 +209,11 @@ button {
   background: var(--color-surface-light);
 }
 
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btn-danger {
   background: var(--color-error);
   color: white;
@@ -775,9 +780,124 @@ button {
   flex-shrink: 0;
 }
 
+.history-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding-top: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
+}
+
+.history-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.history-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.history-table-header,
+.history-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: 1rem 1.5rem;
+}
+
+.history-table-header {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  background: rgba(15, 23, 42, 0.32);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.history-row {
+  width: 100%;
+  text-align: left;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text);
+  border-radius: 0;
+  padding: 1rem 1.5rem;
+}
+
+.history-row:last-child {
+  border-bottom: none;
+}
+
+.history-row:hover {
+  background: var(--color-surface-light);
+}
+
+.history-empty {
+  padding: 1.5rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.history-empty--error {
+  color: var(--color-error);
+}
+
+.history-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.history-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.history-link {
+  display: inline-flex;
+}
+
 @media (max-width: 900px) {
   .middle-row {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .stats-row {
+    flex-direction: column;
+  }
+
+  .recent-row {
+    flex-wrap: wrap;
+  }
+
+  .history-table-header {
+    display: none;
+  }
+
+  .history-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .history-pagination {
+    flex-direction: column;
   }
 }
 

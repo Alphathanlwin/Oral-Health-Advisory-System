@@ -1,9 +1,9 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, text
+from sqlalchemy import JSON, DateTime, ForeignKey, text
 from sqlalchemy import Enum as SAEnum
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models.base import Base
@@ -23,9 +23,9 @@ class Assessment(Base):
     # {"front": "uploads/....jpg", "upper": null, "lower": null} — each slot
     # optional/nullable (Phase 3D: multi-photo guided capture replaced the
     # single photo_url column).
-    photo_urls: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    photo_urls: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     # {"front": <HF response|status>, "upper": ..., "lower": ...}
-    image_analysis_result: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    image_analysis_result: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("NOW()"), nullable=False
     )

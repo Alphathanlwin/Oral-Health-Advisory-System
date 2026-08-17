@@ -1,8 +1,8 @@
 import uuid
 
-from sqlalchemy import ForeignKey, Text, text
+from sqlalchemy import JSON, ForeignKey, Text, text
 from sqlalchemy import Enum as SAEnum
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models.base import Base
@@ -19,7 +19,7 @@ class Diagnosis(Base):
         UUID(as_uuid=True), ForeignKey("assessments.id", ondelete="CASCADE"), nullable=False
     )
     condition: Mapped[Condition] = mapped_column(SAEnum(Condition), nullable=False)
-    triggered_rules: Mapped[list] = mapped_column(JSONB, nullable=False)
+    triggered_rules: Mapped[list] = mapped_column(JSON, nullable=False)
     explanation: Mapped[str] = mapped_column(Text, nullable=False)
 
     assessment: Mapped["Assessment"] = relationship(back_populates="diagnoses")

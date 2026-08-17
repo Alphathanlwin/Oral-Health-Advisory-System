@@ -141,13 +141,13 @@
 ---
 ## Phase 6 — History & Dashboard
 ### Backend
-- [ ] `GET /assessments/` with pagination implemented
-- [ ] `GET /assessments/{id}` with ownership check implemented
-- [ ] Eager loading for diagnoses + recommendations added
+- [x] `GET /assessments/` with pagination implemented
+- [x] `GET /assessments/{id}` with ownership check implemented
+- [x] Eager loading for diagnoses + recommendations added
 ### Frontend
-- [ ] `HistoryPage.jsx` built with paginated list
-- [ ] `DashboardPage.jsx` built (stats + recent assessments)
-- [ ] History rows clickable → navigate to ResultPage
+- [x] `HistoryPage.jsx` built with paginated list
+- [x] `DashboardPage.jsx` built (stats + recent assessments)
+- [x] History rows clickable → navigate to ResultPage
 ---
 ## Phase 7 — Polish & Final Review
 ### Backend
