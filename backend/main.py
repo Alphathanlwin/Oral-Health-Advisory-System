@@ -1,12 +1,16 @@
 import asyncio
+import logging
 import sys
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from routers import assessment, auth, tts
 from utils.response import error_response
+
+logger = logging.getLogger(__name__)
 
 if sys.platform == "win32":
     # prolog_service.py uses asyncio.create_subprocess_exec, which requires
@@ -45,6 +49,28 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     return JSONResponse(
         status_code=exc.status_code,
         content=error_response("REQUEST_ERROR", str(exc.detail)),
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    details = exc.errors()
+    first_error = details[0] if details else {}
+    loc = first_error.get("loc", [])
+    field_name = str(loc[-1]) if loc else "body"
+    message = first_error.get("msg", "Invalid request payload.")
+    return JSONResponse(
+        status_code=422,
+        content=error_response("VALIDATION_ERROR", f"Invalid value for '{field_name}': {message}"),
+    )
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    logger.exception("Unhandled server error", exc_info=exc)
+    return JSONResponse(
+        status_code=500,
+        content=error_response("INTERNAL_SERVER_ERROR", "An unexpected server error occurred. Please try again later."),
     )
 
 

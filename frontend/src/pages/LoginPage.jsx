@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { login } from '../api/auth';
 
 function LoginPage() {
@@ -11,6 +12,7 @@ function LoginPage() {
   const [serverError, setServerError] = useState('');
   
   const { login: authLogin, isAuthenticated } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,13 +56,16 @@ function LoginPage() {
       if (response.success && response.data) {
         const { access_token, user } = response.data;
         authLogin(access_token, user || { id: 'current-user' });
+        showToast('Login successful.', 'success');
         navigate('/');
       }
     } catch (error) {
-      const message = error.response?.data?.detail || 
+      const message = error.response?.data?.error?.message ||
+                     error.response?.data?.detail ||
                      error.response?.data?.message ||
                      'Login failed. Please check your credentials.';
       setServerError(message);
+      showToast(message, 'error');
     } finally {
       setLoading(false);
     }

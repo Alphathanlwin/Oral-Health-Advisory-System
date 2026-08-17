@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
+=======
+from fastapi import APIRouter, Depends, Query
+>>>>>>> 39f3ae3dcfd66e7238098d93c659d13d2826839f
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -27,6 +31,7 @@ async def list_assessments(
     size: int = Query(10, ge=1, le=50),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+<<<<<<< HEAD
 ):
     total_query = select(func.count(Assessment.id)).where(Assessment.user_id == current_user.id)
     total_result = await db.execute(total_query)
@@ -58,10 +63,19 @@ async def list_assessments(
     return success_response(
         data={"items": items, "total": total, "page": page, "size": size},
         message=None,
+=======
+    assessment_service: AssessmentService = Depends(AssessmentService),
+):
+    result = await assessment_service.list_for_user(current_user.id, page, size, db)
+    return success_response(
+        data=result,
+        message="Assessments retrieved successfully.",
+>>>>>>> 39f3ae3dcfd66e7238098d93c659d13d2826839f
     )
 
 
 @router.get("/{assessment_id}")
+<<<<<<< HEAD
 async def get_assessment_detail(
     assessment_id: str,
     current_user: User = Depends(get_current_user),
@@ -92,6 +106,18 @@ async def get_assessment_detail(
     return success_response(
         data=AssessmentResponse.model_validate(assessment).model_dump(mode="json"),
         message=None,
+=======
+async def get_assessment(
+    assessment_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    assessment_service: AssessmentService = Depends(AssessmentService),
+):
+    assessment = await assessment_service.get_for_user(assessment_id, current_user.id, db)
+    return success_response(
+        data=assessment.model_dump(mode="json"),
+        message="Assessment retrieved successfully.",
+>>>>>>> 39f3ae3dcfd66e7238098d93c659d13d2826839f
     )
 
 

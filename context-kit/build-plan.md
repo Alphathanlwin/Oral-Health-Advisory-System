@@ -6,62 +6,61 @@ Each phase produces a working vertical slice of the system.
 ## Phase 1 — Project Setup & Auth
 **Goal**: Running skeleton with working user registration and login.
 ### Backend
-- [ ] Initialize FastAPI project structure (`backend/`)
-- [ ] Set up `.env` and `config.py` with pydantic-settings
-- [ ] Set up `database.py` with async SQLAlchemy engine
-- [ ] Create `User` ORM model
-- [ ] Set up Alembic and create initial migration (users table)
-- [ ] Implement `auth_service.py`: register + login logic
-- [ ] Implement `security.py`: bcrypt hashing + JWT encode/decode
-- [ ] Create `auth.py` router: `POST /auth/register`, `POST /auth/login`
-- [ ] Add `get_current_user` dependency
-- [ ] Add CORS middleware
-- [ ] Test endpoints via Swagger UI (`/docs`)
+- [x] Initialize FastAPI project structure (`backend/`)
+- [x] Set up `.env` and `config.py` with pydantic-settings
+- [x] Set up `database.py` with async SQLAlchemy engine
+- [x] Create `User` ORM model
+- [x] Set up Alembic and create initial migration (users table)
+- [x] Implement `auth_service.py`: register + login logic
+- [x] Implement `security.py`: bcrypt hashing + JWT encode/decode
+- [x] Create `auth.py` router: `POST /auth/register`, `POST /auth/login`
+- [x] Add `get_current_user` dependency
+- [x] Add CORS middleware
+- [x] Test endpoints via Swagger UI (`/docs`)
 ### Frontend
-- [ ] Initialize Vite + React project (`frontend/`)
-- [ ] Set up React Router v6 routes
-- [ ] Create `AuthContext.jsx` with JWT storage in localStorage
-- [ ] Build `LoginPage.jsx` with form + API call
-- [ ] Build `RegisterPage.jsx` with form + API call
-- [ ] Build `ProtectedRoute.jsx`
-- [ ] Build `Navbar.jsx`
-- [ ] Apply global CSS design system (colors, typography, dark theme)
+- [x] Initialize Vite + React project (`frontend/`)
+- [x] Set up React Router v6 routes (using v7, not v6 as originally planned)
+- [x] Create `AuthContext.jsx` with JWT storage in localStorage
+- [x] Build `LoginPage.jsx` with form + API call
+- [x] Build `RegisterPage.jsx` with form + API call
+- [x] Build `ProtectedRoute.jsx`
+- [x] Build `Navbar.jsx`
+- [x] Apply global CSS design system (colors, typography, dark theme)
 ---
 ## Phase 2 — Symptom Questionnaire
 **Goal**: Users can complete the 4-step symptom questionnaire.
 ### Backend
-- [ ] Create `Assessment`, `SymptomResponse` ORM models
-- [ ] Create migration for assessments + symptom_responses tables
-- [ ] Create `SymptomPayload` Pydantic schema
-- [ ] Create `assessment.py` router: `POST /assessments/` (stub — saves symptoms only, returns dummy response)
+- [x] Create `Assessment`, `SymptomResponse` ORM models
+- [x] Create migration for assessments + symptom_responses tables
+- [x] Create `SymptomPayload` Pydantic schema
+- [x] Create `assessment.py` router: `POST /assessments/` (superseded by Phase 3 — wired to the full Prolog-backed service, not just a stub)
 ### Frontend
-- [ ] Build `NewAssessmentPage.jsx` with 4-step stepper
-- [ ] Build `SymptomToggle.jsx` component (YES/NO toggle card)
-- [ ] Build `SymptomForm.jsx` for each step
-- [ ] Track step state + symptom responses in local state
-- [ ] Add step navigation (Back / Next)
-- [ ] Hook up final "Submit" to `POST /api/v1/assessments/`
+- [x] Build `NewAssessmentPage.jsx` with 4-step stepper
+- [x] Build `SymptomToggle.jsx` component (YES/NO toggle card)
+- [x] Build `SymptomForm.jsx` for each step
+- [x] Track step state + symptom responses in local state
+- [x] Add step navigation (Back / Next)
+- [x] Hook up final "Submit" to `POST /api/v1/assessments/`
 ---
 ## Phase 3 — Prolog Diagnosis Engine
 **Goal**: Assessment submission triggers real Prolog reasoning and returns explainable results.
 ### Prolog
-- [ ] Install SWI-Prolog locally
-- [ ] Create `backend/prolog/knowledge_base.pl` (all 6 conditions from `prolog-kb.md`)
-- [ ] Test `.pl` file manually via SWI-Prolog REPL
+- [x] Install SWI-Prolog locally
+- [x] Create `backend/prolog/knowledge_base.pl` (all 6 conditions from `prolog-kb.md`)
+- [x] Test `.pl` file manually via SWI-Prolog REPL
 ### Backend
-- [ ] Install and configure `pyswip`
-- [ ] Implement `prolog_service.py`: assert symptoms, query conditions + risk
-- [ ] Create `Diagnosis`, `Recommendation` ORM models
-- [ ] Create migration for diagnoses + recommendations tables
-- [ ] Implement `assessment_service.py`: full orchestration (symptoms → Prolog → save to DB → return)
-- [ ] Create `AssessmentResponse` Pydantic schema (with nested diagnoses + recommendations)
-- [ ] Wire up `POST /assessments/` to full service
+- [x] Implement `prolog_service.py`: assert symptoms, query conditions + risk (via a **subprocess** bridge to the `swipl` CLI, not `pyswip` — its embedded engine isn't request-isolated for concurrent async requests; see progress-tracker.md decision log)
+- [x] Create `Diagnosis`, `Recommendation` ORM models
+- [x] Create migration for diagnoses + recommendations tables
+- [x] Implement `assessment_service.py`: full orchestration (symptoms → Prolog → save to DB → return)
+- [x] Create `AssessmentResponse` Pydantic schema (with nested diagnoses + recommendations)
+- [x] Wire up `POST /assessments/` to full service
 ### Frontend
-- [ ] Build `ResultPage.jsx`
-- [ ] Build `RiskBadge.jsx`
-- [ ] Build `DiagnosisCard.jsx` (condition + triggered rules as bullet points)
-- [ ] Build `RecommendationCard.jsx` (action + urgency)
-- [ ] Navigate to ResultPage after submission
+- [x] Build `ResultPage.jsx`
+- [x] Build `RiskBadge.jsx`
+- [x] Build `DiagnosisCard.jsx` (condition + triggered rules as bullet points)
+- [x] Build `RecommendationCard.jsx` (action + urgency)
+- [x] Navigate to ResultPage after submission
 ---
 ## Phase 3A — Live AI Screening: Foundation (Frontend-only)
 **Goal**: Prove out the "Dr. Ava" avatar + guided-session pacing before touching camera or backend. This is a new, parallel entry point alongside the static questionnaire (Phase 2) — it does not block or replace it.

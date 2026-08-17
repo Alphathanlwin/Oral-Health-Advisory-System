@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { register } from '../api/auth';
 
 function RegisterPage() {
@@ -15,7 +16,8 @@ function RegisterPage() {
   const [serverError, setServerError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  const { login: authLogin, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -81,7 +83,7 @@ function RegisterPage() {
       
       if (response.success && response.data) {
         setSuccessMessage('Account created successfully! Please sign in.');
-        // Clear form on successful registration
+        showToast('Account created successfully.', 'success');
         setFormData({
           email: '',
           password: '',
@@ -91,10 +93,12 @@ function RegisterPage() {
         setErrors({});
       }
     } catch (error) {
-      const message = error.response?.data?.detail || 
+      const message = error.response?.data?.error?.message ||
+                     error.response?.data?.detail ||
                      error.response?.data?.message ||
                      'Registration failed. Please try again.';
       setServerError(message);
+      showToast(message, 'error');
     } finally {
       setLoading(false);
     }

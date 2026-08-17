@@ -4,6 +4,7 @@ import AiGuide from '../components/AiGuide';
 import SymptomVoiceStep from '../components/SymptomVoiceStep';
 import GuidedCapture from '../components/GuidedCapture';
 import { createAssessment } from '../api/assessment';
+import { useToast } from '../context/ToastContext';
 import { buildResultSummary } from '../utils/resultSummary';
 import { SYMPTOM_QUESTIONS } from '../data/symptomQuestions';
 import { CAPTURE_ANGLES } from '../data/captureAngles';
@@ -19,6 +20,7 @@ function LiveScreeningPage() {
   const [percent, setPercent] = useState(0);
   const [assessment, setAssessment] = useState(null);
   const [submitError, setSubmitError] = useState('');
+  const { showToast } = useToast();
   const analyzeTimer = useRef(null);
 
   // --- caption + pose per screen -------------------------------------------------
@@ -58,11 +60,17 @@ function LiveScreeningPage() {
         if (response.success && response.data) {
           setAssessment(response.data);
         } else {
-          setSubmitError('Something went wrong while analyzing your smile.');
+          const message = 'Something went wrong while analyzing your smile.';
+          setSubmitError(message);
+          showToast(message, 'error');
         }
       })
-      .catch(() => {
-        if (!cancelled) setSubmitError('Something went wrong while analyzing your smile.');
+      .catch((error) => {
+        if (!cancelled) {
+          const message = error?.response?.data?.error?.message || 'Something went wrong while analyzing your smile.';
+          setSubmitError(message);
+          showToast(message, 'error');
+        }
       });
 
     return () => {
