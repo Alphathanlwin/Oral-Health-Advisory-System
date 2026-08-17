@@ -2219,6 +2219,105 @@ video.live-camera-video {
   color: var(--color-risk-low);
 }
 
+.history-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding-top: var(--spacing-xl);
+}
+
+.history-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+}
+
+.history-meta {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.history-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  background: var(--color-surface);
+  border: var(--card-border-width) solid var(--color-border);
+  border-radius: var(--card-border-radius);
+  padding: var(--spacing-lg);
+  text-decoration: none;
+  color: var(--color-text);
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.history-item:hover {
+  transform: translateY(-1px);
+  border-color: rgba(14, 165, 233, 0.4);
+  box-shadow: var(--shadow-md);
+}
+
+.history-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.history-date {
+  font-weight: 600;
+}
+
+.history-label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.history-item-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.history-empty {
+  background: var(--color-surface);
+  border: var(--card-border-width) solid var(--color-border);
+  border-radius: var(--card-border-radius);
+  padding: var(--spacing-xl);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.history-empty--loading,
+.history-empty--error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.history-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  padding-top: var(--spacing-md);
+}
+
+.history-page-indicator {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
 .result-disclaimer {
   display: flex;
   align-items: center;

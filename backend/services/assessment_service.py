@@ -1,6 +1,9 @@
 import uuid
 
+from fastapi import HTTPException
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from models.assessment import Assessment
 from models.diagnosis import Diagnosis
@@ -16,6 +19,50 @@ PHOTO_ANGLES = ("front", "upper", "lower")
 
 
 class AssessmentService:
+    async def list_for_user(self, user_id: uuid.UUID, page: int, size: int, db: AsyncSession) -> dict:
+        offset = (page - 1) * size
+        total_query = await db.scalar(select(func.count()).select_from(Assessment).where(Assessment.user_id == user_id))
+        total = total_query or 0
+
+        result = await db.execute(
+            select(Assessment)
+            .where(Assessment.user_id == user_id)
+            .order_by(Assessment.created_at.desc())
+            .offset(offset)
+            .limit(size)
+            .options(
+                selectinload(Assessment.diagnoses).selectinload(Diagnosis.recommendations),
+            )
+        )
+        assessments = result.scalars().all()
+
+        return {
+            "items": [AssessmentResponse.model_validate(item).model_dump(mode="json") for item in assessments],
+            "total": total,
+            "page": page,
+            "size": size,
+            "pages": max(1, (total + size - 1) // size) if total else 1,
+        }
+
+    async def get_for_user(self, assessment_id: str, user_id: uuid.UUID, db: AsyncSession) -> AssessmentResponse:
+        result = await db.execute(
+            select(Assessment)
+            .where(Assessment.id == assessment_id, Assessment.user_id == user_id)
+            .options(
+                selectinload(Assessment.diagnoses).selectinload(Diagnosis.recommendations),
+            )
+        )
+        assessment = result.scalar_one_or_none()
+        if assessment is None:
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "code": "ASSESSMENT_NOT_FOUND",
+                    "message": f"Assessment with id {assessment_id} was not found.",
+                },
+            )
+        return AssessmentResponse.model_validate(assessment)
+
     async def create(
         self,
         payload: AssessmentCreateRequest,

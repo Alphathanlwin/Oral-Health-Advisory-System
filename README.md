@@ -1,43 +1,83 @@
 # Oral Health Advisory System (OHAS)
 
-## Backend
+OHAS is a FastAPI + React oral-health triage application that supports both a static symptom questionnaire and a guided live screening flow, backed by a SWI-Prolog risk engine and structured result pages.
+
+## Prerequisites
+
+- Python 3.11+
+- Node.js 18+
+- PostgreSQL database
+- SWI-Prolog installed and available on PATH
+- A working `.env` file for both frontend/backend, depending on your deployment setup
+
+## Backend setup
+
+1. Open a terminal in the backend folder.
+2. Create and activate a virtual environment:
 
 ```powershell
 cd backend
+python -m venv .venv
 .\.venv\Scripts\Activate.ps1
+```
+
+3. Install dependencies:
+
+```powershell
+pip install -r requirements.txt
+```
+
+4. Configure your database and secrets in `backend/.env` (or the project environment) as required by `config.py`.
+5. Run the database migrations:
+
+```powershell
+alembic upgrade head
+```
+
+6. Start the API server:
+
+```powershell
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
-Runs at `http://localhost:8000` (and `http://<your-lan-ip>:8000` for other devices on the same Wi-Fi).
+The API is available at `http://localhost:8000` and `http://<your-lan-ip>:8000`.
 
-> **No `--reload`.** The diagnosis engine runs SWI-Prolog as a subprocess
-> (`asyncio.create_subprocess_exec`), which requires Windows' Proactor event
-> loop. `uvicorn --reload` spawns its worker via `multiprocessing`, which on
-> Windows lands on a loop that doesn't support subprocesses at all — every
-> assessment submission fails with a bare `NotImplementedError`. Restart the
-> server manually after backend code changes instead.
+> Important: do not use `--reload` on Windows while the backend is invoking SWI-Prolog in a subprocess. The diagnosis engine relies on the Proactor event loop for subprocess execution; `uvicorn --reload` can break that flow.
 
-## Frontend
+## Frontend setup
+
+1. Open a terminal in the frontend folder.
+2. Install dependencies:
 
 ```powershell
 cd frontend
-npm run dev
+npm install
 ```
 
-Runs at `https://localhost:5173` (and `https://<your-lan-ip>:5173` for other devices, e.g. testing the camera flow on a phone — accept the self-signed certificate warning).
+3. Start the app:
 
-## Phone Access
-
-With both servers running, open on your phone (same Wi-Fi):
-
-```text
-https://10.224.87.70:5173
+```powershell
+npm run dev -- --host 0.0.0.0
 ```
 
-> This IP is this machine's current Wi-Fi address — it can change (e.g. after
-> reconnecting to Wi-Fi or a DHCP lease renewal). If the page won't load,
-> get the current one with:
->
-> ```powershell
-> Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias "Wi-Fi" | Select-Object IPAddress
-> ```
+The frontend runs at `https://localhost:5173` and can be reached from a phone on the same network using the machine's LAN IP.
+
+## Demo and test flow
+
+- Register or log in using the auth UI.
+- Use either the static questionnaire under `/assessment/new` or the live screening flow at `/assessment/live`.
+- Review the generated result on the result page, including disclaimer copy, recommendations, and risk badge.
+- Open the history dashboard to review prior assessments and pagination state.
+
+## Common issues
+
+- If the backend reports 500 errors, confirm the database and Prolog engine are both reachable.
+- If the live camera path fails on a phone, use HTTPS/localhost as required by browser secure-context rules.
+- If `uvicorn` crashes after a code change, restart it manually rather than using `--reload` on Windows.
+
+## Project structure
+
+- `backend/` — FastAPI app, services, models, Prolog engine, and auth routes
+- `frontend/` — Vite + React patient experience
+- `context-kit/` — product, architecture, API, and design documentation
+- `OHAS.pen` — design source for the app UI system

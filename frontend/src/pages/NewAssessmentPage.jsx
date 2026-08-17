@@ -1,6 +1,7 @@
 import { useState, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createAssessment } from '../api/assessment';
+import { useToast } from '../context/ToastContext';
 import SymptomToggle from '../components/SymptomToggle';
 import PhotoUpload from '../components/PhotoUpload';
 import { SYMPTOM_STEPS as STEPS, initialSymptoms } from '../data/symptomQuestions';
@@ -11,6 +12,7 @@ function NewAssessmentPage() {
   const [photo, setPhoto] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const step = STEPS[stepIndex];
@@ -45,6 +47,7 @@ function NewAssessmentPage() {
         photos: { front: photoBase64, upper: null, lower: null },
       });
       if (response.success && response.data) {
+        showToast('Assessment submitted successfully.', 'success');
         navigate(`/assessment/${response.data.id}/result`, { state: { assessment: response.data } });
       }
     } catch (err) {
@@ -53,6 +56,7 @@ function NewAssessmentPage() {
         err.response?.data?.detail ||
         'Could not submit your assessment. Please try again.';
       setError(message);
+      showToast(message, 'error');
     } finally {
       setSubmitting(false);
     }

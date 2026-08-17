@@ -1,4 +1,5 @@
 import uuid
+from unittest.mock import patch
 
 import httpx
 import pytest
@@ -92,3 +93,22 @@ async def test_register_rejects_short_password():
             json={"email": _unique_email(), "password": "short", "full_name": "Short Pass"},
         )
         assert response.status_code == 422
+        assert response.json()["error"]["code"] == "VALIDATION_ERROR"
+
+
+async def test_unhandled_exception_returns_standard_error_response():
+    async with await _client() as client:
+        with patch("routers.auth.AuthService.register", side_effect=RuntimeError("boom")):
+            response = await client.post(
+                "/api/v1/auth/register",
+                json={
+                    "email": _unique_email(),
+                    "password": PASSWORD,
+                    "full_name": "Test User",
+                    "date_of_birth": "1990-05-15",
+                },
+            )
+
+        assert response.status_code == 500
+        assert response.json()["success"] is False
+        assert response.json()["error"]["code"] == "INTERNAL_SERVER_ERROR"

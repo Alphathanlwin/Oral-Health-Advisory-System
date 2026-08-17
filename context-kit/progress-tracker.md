@@ -151,16 +151,16 @@
 ---
 ## Phase 7 — Polish & Final Review
 ### Backend
-- [ ] Global exception handler added
-- [ ] Input validation confirmed for all endpoints
-- [ ] All error codes match `api-standards.md`
-- [ ] `README.md` written
+- [x] Global exception handler added
+- [x] Input validation confirmed for all endpoints
+- [x] All error codes match `api-standards.md`
+- [x] `README.md` written
 ### Frontend
-- [ ] Loading spinners added to all async operations
-- [ ] Error toast notifications implemented
-- [ ] All form validations complete
-- [ ] Disclaimer text on ResultPage added
-- [ ] Final visual polish done (spacing, animations, responsiveness) across both entry points
+- [x] Loading spinners added to all async operations
+- [x] Error toast notifications implemented
+- [x] All form validations complete
+- [x] Disclaimer text on ResultPage added
+- [x] Final visual polish done (spacing, animations, responsiveness) across both entry points
 ### Testing & Documentation
 - [ ] All 6 conditions tested manually (symptom combinations)
 - [ ] Photo upload tested (valid + invalid cases) — static form AND Live Screening
@@ -169,7 +169,7 @@
 - [ ] Telegram delivery + nearby clinic discovery tested
 - [ ] History pagination tested
 - [ ] JWT expiry + protected route tested
-- [ ] Final `progress-tracker.md` status updated
+- [x] Final `progress-tracker.md` status updated
 ---
 ## Notes / Decisions Log
 > Record important decisions made during development here.
