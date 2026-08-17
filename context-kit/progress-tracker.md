@@ -17,78 +17,139 @@
 - [x] CORS middleware configured
 - [x] Auth endpoints tested via Swagger UI
 ### Frontend
-- [x] Vite + React project initialized
-- [x] React Router routes configured (using v7, not v6 as originally planned)
-- [x] `AuthContext.jsx` implemented
-- [x] `LoginPage.jsx` built and connected to API
-- [x] `RegisterPage.jsx` built and connected to API
-- [x] `ProtectedRoute.jsx` implemented
-- [x] `Navbar.jsx` built
-- [x] Global CSS design system applied (dark theme, colors, typography)
+- [ ] Vite + React project initialized
+- [ ] React Router v6 routes configured
+- [ ] `AuthContext.jsx` implemented
+- [ ] `LoginPage.jsx` built and connected to API
+- [ ] `RegisterPage.jsx` built and connected to API
+- [ ] `ProtectedRoute.jsx` implemented
+- [ ] `Navbar.jsx` built
+- [ ] Global CSS design system applied (dark theme, colors, typography)
 ---
 ## Phase 2 — Symptom Questionnaire
 ### Backend
-- [x] `Assessment` ORM model created
-- [x] `SymptomResponse` ORM model created
-- [x] Migration for assessments + symptom_responses tables run
-- [x] `SymptomPayload` Pydantic schema created
-- [x] `POST /assessments/` stub endpoint implemented (saves symptoms, returns dummy `risk_level: LOW`)
+- [ ] `Assessment` ORM model created
+- [ ] `SymptomResponse` ORM model created
+- [ ] Migration for assessments + symptom_responses tables run
+- [ ] `SymptomPayload` Pydantic schema created
+- [ ] `POST /assessments/` stub endpoint implemented
 ### Frontend
-- [x] `NewAssessmentPage.jsx` with 4-step stepper built
-- [x] `SymptomToggle.jsx` component built
-- [x] Step 1 form (Pain & Sensitivity) built
-- [x] Step 2 form (Gum & Appearance) built
-- [x] Step 3 form (Mouth & Habits) built
-- [x] Step 4 form (Hygiene & Photo) built — photo upload added (`PhotoUpload.jsx`)
-- [x] Step navigation (Back / Next) working
-- [x] Submit button wired to `POST /api/v1/assessments/`
+- [ ] `NewAssessmentPage.jsx` with 4-step stepper built
+- [ ] `SymptomToggle.jsx` component built
+- [ ] Step 1 form (Pain & Sensitivity) built
+- [ ] Step 2 form (Gum & Appearance) built
+- [ ] Step 3 form (Mouth & Habits) built
+- [ ] Step 4 form (Hygiene & Photo) built
+- [ ] Step navigation (Back / Next) working
+- [ ] Submit button wired to `POST /api/v1/assessments/`
 ---
 ## Phase 3 — Prolog Diagnosis Engine
 ### Prolog
-- [x] SWI-Prolog installed locally (10.0.2, on PATH)
-- [x] `knowledge_base.pl` created with all 6 conditions
-- [x] KB tested manually in SWI-Prolog REPL (single-condition, multi-condition, and no-symptom cases)
+- [ ] SWI-Prolog installed locally
+- [ ] `knowledge_base.pl` created with all 6 conditions
+- [ ] KB tested manually in SWI-Prolog REPL
 ### Backend
-- [x] `prolog_service.py` implemented — **subprocess-based** (pyswip skipped: not request-isolated for concurrent async requests, and flaky on Windows per `library-docs.md`'s own caveat)
-- [x] `Diagnosis` ORM model created
-- [x] `Recommendation` ORM model created
-- [x] Migration for diagnoses + recommendations tables run
-- [x] `assessment_service.py` fully implemented (Prolog orchestration)
-- [x] `AssessmentResponse` Pydantic schema created (nested `diagnoses[].recommendations[]`)
-- [x] `POST /assessments/` wired to full service
+- [ ] `pyswip` installed and configured
+- [ ] `prolog_service.py` implemented
+- [ ] `Diagnosis` ORM model created
+- [ ] `Recommendation` ORM model created
+- [ ] Migration for diagnoses + recommendations tables run
+- [ ] `assessment_service.py` fully implemented (Prolog orchestration)
+- [ ] `AssessmentResponse` Pydantic schema created
+- [ ] `POST /assessments/` wired to full service
 ### Frontend
-- [x] `ResultPage.jsx` built
-- [x] `RiskBadge.jsx` component built
-- [x] `DiagnosisCard.jsx` component built
-- [x] `RecommendationCard.jsx` component built
-- [x] Navigation to ResultPage after submission working
-- [x] **Phase 3E**: `LiveScreeningPage.jsx`'s analyzing step calls the real `POST /assessments/`; reveal step shows the real risk badge + a Dr. Ava spoken summary; "View full results" navigates to `ResultPage.jsx` with the real assessment ID + data. `ResultPage.jsx` gained a Dr. Ava "here's what I found" treatment (reused `AiGuide.jsx`) next to the risk badge, driven by a summary shared with the reveal step (`utils/resultSummary.js`).
+- [ ] `ResultPage.jsx` built
+- [ ] `RiskBadge.jsx` component built
+- [ ] `DiagnosisCard.jsx` component built
+- [ ] `RecommendationCard.jsx` component built
+- [ ] Navigation to ResultPage after submission working
 ---
-## Phase 4 — Photo Upload & CV Integration
+## Phase 3A — Live AI Screening: Foundation (Frontend-only)
+> New parallel entry point alongside the static questionnaire — does not block or replace Phase 2/3.
+### Frontend
+- [ ] `AiGuide.jsx` built (avatar, `state` prop, pose swapping, idle breathing animation, speech-bubble caption)
+- [ ] `utils/speech.js` built (`speak(text, { onStart, onEnd })` wrapper around `SpeechSynthesis`)
+- [ ] Mouth-swap talking animation (`useTalkingMouth` hook) wired to `onStart`/`onEnd`
+- [ ] `LiveScreeningPage.jsx` state machine built (`intro → ask_symptoms → capture_front → capture_upper → capture_lower → analyzing → reveal`) with dummy/hardcoded transitions
+- [ ] Route `/assessment/live` added in `App.jsx`
+- [ ] "Live AI Screening" button added on `DashboardPage.jsx`
+- [ ] Screens match Pencil.dev designs for each state
+---
+## Phase 3B — Live AI Screening: Symptom Voice Step
+### Frontend
+- [ ] `SymptomVoiceStep.jsx` built (one YES/NO question at a time, reuses symptom key list + `SymptomToggle` styling)
+- [ ] Answers wired into local state matching existing `symptoms{}` payload shape
+- [ ] Dr. Ava speaks each question via `speak()` before showing Yes/No buttons
+- [ ] Progress dots reflect question count
+---
+## Phase 3C — Live AI Screening: Guided Camera Capture
+### Frontend
+- [ ] `GuidedCapture.jsx` built (`getUserMedia`, live `<video>` preview, `<canvas>` capture)
+- [ ] 3 SVG overlay guides built (front bite / upper arch / lower arch)
+- [ ] Sequential flow: capture → confirm/retake → next angle
+- [ ] Camera-denied fallback → Dr. Ava apologetic pose → falls back to `PhotoUpload.jsx`
+- [ ] 3 captured images stored as base64 in local state
+---
+## Phase 3D — Live AI Screening: Backend Multi-Photo + CV Integration
+> Folds in the original Phase 4 CV work, pulled forward to support Live Screening.
 ### Backend
-- [x] `uploads/` directory structure created
-- [x] `image_utils.py` implemented (validation + save) — reused as-is per-photo for Phase 3D, no changes needed
-- [x] `cv_service.py` implemented (HuggingFace API call)
-- [x] CV label → symptom key mapping implemented
-- [x] CV results integrated into `assessment_service.py`
-- [x] Graceful fallback on `CV_SERVICE_UNAVAILABLE`
-- [x] **Phase 3D**: upgraded from single photo to `photos: {front, upper, lower}` — CV runs per-image, detected symptoms unioned across all 3 before the Prolog query; a per-image `CV_SERVICE_UNAVAILABLE` no longer drops the other images' results
-### Frontend
-- [x] `PhotoUpload.jsx` component built
-- [x] Photo upload added to Step 4
-- [x] Base64 encoding of photo in payload working — updated to send `photos: {front, upper: null, lower: null}` after the Phase 3D schema rename
+- [ ] `AssessmentCreate` schema updated: `photo_base64` → `photos: {front, upper, lower}` (optional, nullable)
+- [ ] `uploads/` directory structure created
+- [ ] `image_utils.py` implemented (validation + save)
+- [ ] `cv_service.py` implemented (HuggingFace API call per image)
+- [ ] CV label → symptom key mapping implemented
+- [ ] CV results merged (union across 3 images) and integrated into `assessment_service.py`
+- [ ] Graceful fallback on `CV_SERVICE_UNAVAILABLE`
+- [ ] `prolog_service.py` + `knowledge_base.pl` confirmed in place (Phase 3)
 ---
-## Phase 5 — History & Dashboard
+## Phase 3E — Live AI Screening: Reveal + Result Integration
+### Frontend
+- [ ] `reveal` state shows risk-level badge + spoken summary via Dr. Ava
+- [ ] Navigation to `ResultPage.jsx` with real assessment ID working
+- [ ] Dr. Ava "here's what I found" treatment added to `ResultPage.jsx` (reuses `AiGuide.jsx`)
+- [ ] `DiagnosisCard.jsx` / `RecommendationCard.jsx` confirmed working for Live-Screening-originated assessments
+---
+## Phase 4 — AI Chatbot (Intake + Explainer)
+> Constrained, non-diagnostic LLM assistance. Prolog remains the sole diagnostic authority.
+### Backend
+- [ ] `llm_service.py` implemented (thin LLM API wrapper)
+- [ ] `chat_intake_service.py` implemented (free-text → extracted `symptoms{}`, validated against allowed keys)
+- [ ] `routers/chat.py`: `POST /api/v1/chat/intake` implemented
+- [ ] `chat_explain_service.py` implemented (grounded strictly in assessment's own `triggered_rules`/`explanation`/`recommendation`)
+- [ ] `POST /api/v1/chat/explain` implemented
+- [ ] `schemas/chat.py` created (`ChatIntakeRequest/Response`, `ChatExplainRequest/Response`)
+- [ ] `LLM_API_KEY`, `LLM_MODEL` added to `.env`
+- [ ] Graceful fallback on `LLM_SERVICE_UNAVAILABLE`
+### Frontend
+- [ ] Optional free-text symptom entry point wired to `/chat/intake`
+- [ ] Chat input component built on `ResultPage.jsx`, wired to `/chat/explain`
+- [ ] Dr. Ava optionally speaks explainer answers via `speak()`
+---
+## Phase 5 — Delivery & Discovery
+### Backend
+- [ ] `telegram_chat_id` column added to `users`
+- [ ] Bot-linking flow implemented (`/start` deep link)
+- [ ] `notification_service.py` implemented (Telegram Bot API `sendMessage`, fire-and-forget, try/except)
+- [ ] `clinic_service.py` implemented (Google Places Nearby Search, `type=dentist`)
+- [ ] `GET /api/v1/clinics/nearby?lat=&lng=&radius=` implemented
+- [ ] Graceful fallback on `CLINIC_SERVICE_UNAVAILABLE`
+- [ ] `GOOGLE_PLACES_API_KEY` added to `.env`
+### Frontend
+- [ ] "Find nearby clinics" button + list UI built on `ResultPage.jsx`
+- [ ] Telegram account linking UI built
+> Note: Real calendar/slot booking (Google Calendar API) is parked — this phase is clinic discovery only.
+---
+## Phase 6 — History & Dashboard
 ### Backend
 - [ ] `GET /assessments/` with pagination implemented
 - [ ] `GET /assessments/{id}` with ownership check implemented
 - [ ] Eager loading for diagnoses + recommendations added
 ### Frontend
 - [ ] `HistoryPage.jsx` built with paginated list
-- [x] `DashboardPage.jsx` built (stats + recent assessments)
+- [ ] `DashboardPage.jsx` built (stats + recent assessments)
 - [ ] History rows clickable → navigate to ResultPage
 ---
-## Phase 6 — Polish & Final Review
+## Phase 7 — Polish & Final Review
 ### Backend
 - [ ] Global exception handler added
 - [ ] Input validation confirmed for all endpoints
@@ -99,13 +160,24 @@
 - [ ] Error toast notifications implemented
 - [ ] All form validations complete
 - [ ] Disclaimer text on ResultPage added
-- [ ] Final visual polish done (spacing, animations, responsiveness)
+- [ ] Final visual polish done (spacing, animations, responsiveness) across both entry points
 ### Testing & Documentation
 - [ ] All 6 conditions tested manually (symptom combinations)
-- [ ] Photo upload tested (valid + invalid cases)
+- [ ] Photo upload tested (valid + invalid cases) — static form AND Live Screening
+- [ ] Live Screening camera fallback path tested
+- [ ] Chatbot intake + explainer grounding tested (no off-topic answers)
+- [ ] Telegram delivery + nearby clinic discovery tested
 - [ ] History pagination tested
 - [ ] JWT expiry + protected route tested
 - [ ] Final `progress-tracker.md` status updated
+---
+## Notes / Decisions Log
+> Record important decisions made during development here.
+| Date | Decision | Reason |
+|------|----------|--------|
+| 2026-08-09 | Direct Supabase DB host (`db.*.supabase.co`) is IPv6-only and unreachable from this machine; switched to **transaction pooler** (`aws-0-ap-northeast-1.pooler.supabase.com:6543`) with `?ssl=require`. | Pooler resolves to IPv4 and allows SSL; direct host has only an AAAA record and no IPv6 route. |
+| 2026-08-09 | Disabled asyncpg statement caching (`statement_cache_size=0`, `prepared_statement_cache_size=0`) in `database.py` and `alembic/env.py`. | Supabase transaction pooler does not support asyncpg prepared statements (`DuplicatePreparedStatementError`). |
+| 2026-08-09 | Pinned `bcrypt==4.0.1` in `requirements.txt`. | `passlib 1.7.4` is incompatible with `bcrypt>=4.1` (removed `__about__`), crashing register with 500. |
 ---
 ## Notes / Decisions Log
 > Record important decisions made during development here.

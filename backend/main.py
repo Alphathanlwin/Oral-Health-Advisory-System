@@ -1,9 +1,21 @@
+import asyncio
+import sys
+
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from routers import assessment, auth, tts
 from utils.response import error_response
+
+if sys.platform == "win32":
+    # prolog_service.py uses asyncio.create_subprocess_exec, which requires
+    # ProactorEventLoop on Windows (the default loop). Run this server
+    # WITHOUT --reload: uvicorn's --reload spawns the worker via
+    # multiprocessing, which on Windows ends up on a loop that doesn't
+    # support subprocesses at all, breaking every Prolog-backed request with
+    # a bare NotImplementedError. See README.md.
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
 app = FastAPI(title="OHAS API", version="1.0.0")
 
