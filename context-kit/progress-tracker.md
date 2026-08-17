@@ -17,97 +17,96 @@
 - [x] CORS middleware configured
 - [x] Auth endpoints tested via Swagger UI
 ### Frontend
-- [ ] Vite + React project initialized
-- [ ] React Router v6 routes configured
-- [ ] `AuthContext.jsx` implemented
-- [ ] `LoginPage.jsx` built and connected to API
-- [ ] `RegisterPage.jsx` built and connected to API
-- [ ] `ProtectedRoute.jsx` implemented
-- [ ] `Navbar.jsx` built
-- [ ] Global CSS design system applied (dark theme, colors, typography)
+- [x] Vite + React project initialized
+- [x] React Router v6 routes configured (using v7, not v6 as originally planned)
+- [x] `AuthContext.jsx` implemented
+- [x] `LoginPage.jsx` built and connected to API
+- [x] `RegisterPage.jsx` built and connected to API
+- [x] `ProtectedRoute.jsx` implemented
+- [x] `Navbar.jsx` built
+- [x] Global CSS design system applied (dark theme, colors, typography)
 ---
 ## Phase 2 — Symptom Questionnaire
 ### Backend
-- [ ] `Assessment` ORM model created
-- [ ] `SymptomResponse` ORM model created
-- [ ] Migration for assessments + symptom_responses tables run
-- [ ] `SymptomPayload` Pydantic schema created
-- [ ] `POST /assessments/` stub endpoint implemented
+- [x] `Assessment` ORM model created
+- [x] `SymptomResponse` ORM model created
+- [x] Migration for assessments + symptom_responses tables run
+- [x] `SymptomPayload` Pydantic schema created
+- [x] `POST /assessments/` stub endpoint implemented (superseded by Phase 3 — wired to the full Prolog-backed service, not just a stub)
 ### Frontend
-- [ ] `NewAssessmentPage.jsx` with 4-step stepper built
-- [ ] `SymptomToggle.jsx` component built
-- [ ] Step 1 form (Pain & Sensitivity) built
-- [ ] Step 2 form (Gum & Appearance) built
-- [ ] Step 3 form (Mouth & Habits) built
-- [ ] Step 4 form (Hygiene & Photo) built
-- [ ] Step navigation (Back / Next) working
-- [ ] Submit button wired to `POST /api/v1/assessments/`
+- [x] `NewAssessmentPage.jsx` with 4-step stepper built
+- [x] `SymptomToggle.jsx` component built
+- [x] Step 1 form (Pain & Sensitivity) built
+- [x] Step 2 form (Gum & Appearance) built
+- [x] Step 3 form (Mouth & Habits) built
+- [x] Step 4 form (Hygiene & Photo) built
+- [x] Step navigation (Back / Next) working
+- [x] Submit button wired to `POST /api/v1/assessments/`
 ---
 ## Phase 3 — Prolog Diagnosis Engine
 ### Prolog
-- [ ] SWI-Prolog installed locally
-- [ ] `knowledge_base.pl` created with all 6 conditions
-- [ ] KB tested manually in SWI-Prolog REPL
+- [x] SWI-Prolog installed locally
+- [x] `knowledge_base.pl` created with all 6 conditions
+- [x] KB tested manually in SWI-Prolog REPL
 ### Backend
-- [ ] `pyswip` installed and configured
-- [ ] `prolog_service.py` implemented
-- [ ] `Diagnosis` ORM model created
-- [ ] `Recommendation` ORM model created
-- [ ] Migration for diagnoses + recommendations tables run
-- [ ] `assessment_service.py` fully implemented (Prolog orchestration)
-- [ ] `AssessmentResponse` Pydantic schema created
-- [ ] `POST /assessments/` wired to full service
+- [x] `prolog_service.py` implemented (via a **subprocess** bridge to the `swipl` CLI, not `pyswip` — its embedded engine isn't request-isolated for concurrent async requests; see decision log)
+- [x] `Diagnosis` ORM model created
+- [x] `Recommendation` ORM model created
+- [x] Migration for diagnoses + recommendations tables run
+- [x] `assessment_service.py` fully implemented (Prolog orchestration)
+- [x] `AssessmentResponse` Pydantic schema created
+- [x] `POST /assessments/` wired to full service
 ### Frontend
-- [ ] `ResultPage.jsx` built
-- [ ] `RiskBadge.jsx` component built
-- [ ] `DiagnosisCard.jsx` component built
-- [ ] `RecommendationCard.jsx` component built
-- [ ] Navigation to ResultPage after submission working
+- [x] `ResultPage.jsx` built
+- [x] `RiskBadge.jsx` component built
+- [x] `DiagnosisCard.jsx` component built
+- [x] `RecommendationCard.jsx` component built
+- [x] Navigation to ResultPage after submission working
 ---
 ## Phase 3A — Live AI Screening: Foundation (Frontend-only)
 > New parallel entry point alongside the static questionnaire — does not block or replace Phase 2/3.
 ### Frontend
-- [ ] `AiGuide.jsx` built (avatar, `state` prop, pose swapping, idle breathing animation, speech-bubble caption)
-- [ ] `utils/speech.js` built (`speak(text, { onStart, onEnd })` wrapper around `SpeechSynthesis`)
-- [ ] Mouth-swap talking animation (`useTalkingMouth` hook) wired to `onStart`/`onEnd`
-- [ ] `LiveScreeningPage.jsx` state machine built (`intro → ask_symptoms → capture_front → capture_upper → capture_lower → analyzing → reveal`) with dummy/hardcoded transitions
-- [ ] Route `/assessment/live` added in `App.jsx`
-- [ ] "Live AI Screening" button added on `DashboardPage.jsx`
-- [ ] Screens match Pencil.dev designs for each state
+- [x] `AiGuide.jsx` built (avatar, `state` prop, pose swapping, idle breathing animation, speech-bubble caption)
+- [x] `utils/speech.js` built (`speak(text, { onStart, onEnd })` wrapper — now tries real ElevenLabs TTS first, falls back to `SpeechSynthesis`)
+- [x] Mouth-swap talking animation (`useTalkingMouth` hook) wired to `onStart`/`onEnd`
+- [x] `LiveScreeningPage.jsx` state machine built (`intro → ask_symptoms → capture → analyzing → reveal`) — now wired to the real API, not dummy transitions
+- [x] Route `/assessment/live` added in `App.jsx`
+- [x] "Live AI Screening" button added on `DashboardPage.jsx`
+- [x] Screens match Pencil.dev designs for each state
 ---
 ## Phase 3B — Live AI Screening: Symptom Voice Step
 ### Frontend
-- [ ] `SymptomVoiceStep.jsx` built (one YES/NO question at a time, reuses symptom key list + `SymptomToggle` styling)
-- [ ] Answers wired into local state matching existing `symptoms{}` payload shape
-- [ ] Dr. Ava speaks each question via `speak()` before showing Yes/No buttons
-- [ ] Progress dots reflect question count
+- [x] `SymptomVoiceStep.jsx` built (one YES/NO question at a time, reuses symptom key list + `SymptomToggle` styling)
+- [x] Answers wired into local state matching existing `symptoms{}` payload shape
+- [x] Dr. Ava speaks each question via `speak()` before showing Yes/No buttons
+- [x] Progress dots reflect question count
 ---
 ## Phase 3C — Live AI Screening: Guided Camera Capture
 ### Frontend
-- [ ] `GuidedCapture.jsx` built (`getUserMedia`, live `<video>` preview, `<canvas>` capture)
-- [ ] 3 SVG overlay guides built (front bite / upper arch / lower arch)
-- [ ] Sequential flow: capture → confirm/retake → next angle
-- [ ] Camera-denied fallback → Dr. Ava apologetic pose → falls back to `PhotoUpload.jsx`
-- [ ] 3 captured images stored as base64 in local state
+- [x] `GuidedCapture.jsx` built (`getUserMedia`, live `<video>` preview, `<canvas>` capture)
+- [x] 3 SVG overlay guides built (front bite / upper arch / lower arch)
+- [x] Sequential flow: capture → confirm/retake → next angle
+- [x] Camera-denied fallback → Dr. Ava apologetic pose → falls back to `PhotoUpload.jsx`
+- [x] 3 captured images stored as base64 in local state
 ---
 ## Phase 3D — Live AI Screening: Backend Multi-Photo + CV Integration
 > Folds in the original Phase 4 CV work, pulled forward to support Live Screening.
 ### Backend
-- [ ] `AssessmentCreate` schema updated: `photo_base64` → `photos: {front, upper, lower}` (optional, nullable)
-- [ ] `uploads/` directory structure created
-- [ ] `image_utils.py` implemented (validation + save)
-- [ ] `cv_service.py` implemented (HuggingFace API call per image)
-- [ ] CV label → symptom key mapping implemented
-- [ ] CV results merged (union across 3 images) and integrated into `assessment_service.py`
-- [ ] Graceful fallback on `CV_SERVICE_UNAVAILABLE`
-- [ ] `prolog_service.py` + `knowledge_base.pl` confirmed in place (Phase 3)
+- [x] `AssessmentCreate` schema updated: `photo_base64` → `photos: {front, upper, lower}` (optional, nullable)
+- [x] `uploads/` directory structure created
+- [x] `image_utils.py` implemented (validation + save)
+- [x] `cv_service.py` implemented (HuggingFace API call per image)
+- [x] CV label → symptom key mapping implemented
+- [x] CV results merged (union across 3 images) and integrated into `assessment_service.py`
+- [x] Graceful fallback on `CV_SERVICE_UNAVAILABLE`
+- [x] `prolog_service.py` + `knowledge_base.pl` confirmed in place (Phase 3)
 ---
 ## Phase 3E — Live AI Screening: Reveal + Result Integration
 ### Frontend
-- [ ] `reveal` state shows risk-level badge + spoken summary via Dr. Ava
-- [ ] Navigation to `ResultPage.jsx` with real assessment ID working
-- [ ] Dr. Ava "here's what I found" treatment added to `ResultPage.jsx` (reuses `AiGuide.jsx`)
-- [ ] `DiagnosisCard.jsx` / `RecommendationCard.jsx` confirmed working for Live-Screening-originated assessments
+- [x] `reveal` state shows risk-level badge + spoken summary via Dr. Ava
+- [x] Navigation to `ResultPage.jsx` with real assessment ID working
+- [x] Dr. Ava "here's what I found" treatment added to `ResultPage.jsx` (reuses `AiGuide.jsx`)
+- [x] `DiagnosisCard.jsx` / `RecommendationCard.jsx` confirmed working for Live-Screening-originated assessments
 ---
 ## Phase 4 — AI Chatbot (Intake + Explainer)
 > Constrained, non-diagnostic LLM assistance. Prolog remains the sole diagnostic authority.
@@ -146,7 +145,7 @@
 - [ ] Eager loading for diagnoses + recommendations added
 ### Frontend
 - [ ] `HistoryPage.jsx` built with paginated list
-- [ ] `DashboardPage.jsx` built (stats + recent assessments)
+- [x] `DashboardPage.jsx` built (stats + recent assessments)
 - [ ] History rows clickable → navigate to ResultPage
 ---
 ## Phase 7 — Polish & Final Review
