@@ -1,22 +1,10 @@
-<<<<<<< HEAD
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import func, select
-=======
 from fastapi import APIRouter, Depends, Query
->>>>>>> 39f3ae3dcfd66e7238098d93c659d13d2826839f
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from database import get_db
 from dependencies import get_current_user
-from models.assessment import Assessment
-from models.diagnosis import Diagnosis
 from models.user import User
-from schemas.assessment import (
-    AssessmentCreateRequest,
-    AssessmentResponse,
-    AssessmentSummaryResponse,
-)
+from schemas.assessment import AssessmentCreateRequest
 from services.assessment_service import AssessmentService
 from services.cv_service import CVService
 from services.prolog_service import PrologService
@@ -31,82 +19,16 @@ async def list_assessments(
     size: int = Query(10, ge=1, le=50),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-<<<<<<< HEAD
-):
-    total_query = select(func.count(Assessment.id)).where(Assessment.user_id == current_user.id)
-    total_result = await db.execute(total_query)
-    total = total_result.scalar_one()
-
-    offset = (page - 1) * size
-    statement = (
-        select(Assessment)
-        .where(Assessment.user_id == current_user.id)
-        .order_by(Assessment.created_at.desc())
-        .offset(offset)
-        .limit(size)
-        .options(selectinload(Assessment.diagnoses))
-    )
-    result = await db.execute(statement)
-    assessments = result.scalars().all()
-
-    items = []
-    for assessment in assessments:
-        items.append(
-            AssessmentSummaryResponse(
-                id=assessment.id,
-                created_at=assessment.created_at,
-                risk_level=assessment.risk_level,
-                conditions_detected=[diagnosis.condition for diagnosis in assessment.diagnoses],
-            ).model_dump(mode="json")
-        )
-
-    return success_response(
-        data={"items": items, "total": total, "page": page, "size": size},
-        message=None,
-=======
     assessment_service: AssessmentService = Depends(AssessmentService),
 ):
     result = await assessment_service.list_for_user(current_user.id, page, size, db)
     return success_response(
         data=result,
         message="Assessments retrieved successfully.",
->>>>>>> 39f3ae3dcfd66e7238098d93c659d13d2826839f
     )
 
 
 @router.get("/{assessment_id}")
-<<<<<<< HEAD
-async def get_assessment_detail(
-    assessment_id: str,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    statement = (
-        select(Assessment)
-        .where(Assessment.id == assessment_id)
-        .options(
-            selectinload(Assessment.diagnoses).selectinload(Diagnosis.recommendations),
-        )
-    )
-    result = await db.execute(statement)
-    assessment = result.scalar_one_or_none()
-
-    if assessment is None:
-        raise HTTPException(
-            status_code=404,
-            detail={"code": "ASSESSMENT_NOT_FOUND", "message": "Assessment not found."},
-        )
-
-    if assessment.user_id != current_user.id:
-        raise HTTPException(
-            status_code=403,
-            detail={"code": "FORBIDDEN", "message": "You do not have access to this assessment."},
-        )
-
-    return success_response(
-        data=AssessmentResponse.model_validate(assessment).model_dump(mode="json"),
-        message=None,
-=======
 async def get_assessment(
     assessment_id: str,
     current_user: User = Depends(get_current_user),
@@ -117,7 +39,6 @@ async def get_assessment(
     return success_response(
         data=assessment.model_dump(mode="json"),
         message="Assessment retrieved successfully.",
->>>>>>> 39f3ae3dcfd66e7238098d93c659d13d2826839f
     )
 
 
