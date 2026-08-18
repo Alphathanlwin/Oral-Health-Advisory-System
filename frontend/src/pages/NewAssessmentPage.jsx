@@ -4,11 +4,13 @@ import { createAssessment } from '../api/assessment';
 import { useToast } from '../context/ToastContext';
 import SymptomToggle from '../components/SymptomToggle';
 import PhotoUpload from '../components/PhotoUpload';
+import SymptomIntakeChat from '../components/SymptomIntakeChat';
 import { SYMPTOM_STEPS as STEPS, initialSymptoms } from '../data/symptomQuestions';
 
 function NewAssessmentPage() {
   const [stepIndex, setStepIndex] = useState(0);
   const [symptoms, setSymptoms] = useState(initialSymptoms);
+  const [aiFilledKeys, setAiFilledKeys] = useState(() => new Set());
   const [photo, setPhoto] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -24,6 +26,17 @@ function NewAssessmentPage() {
 
   const handleToggle = (key, value) => {
     setSymptoms((prev) => ({ ...prev, [key]: value }));
+    setAiFilledKeys((prev) => {
+      if (!prev.has(key)) return prev;
+      const next = new Set(prev);
+      next.delete(key);
+      return next;
+    });
+  };
+
+  const handleIntakeApply = (partialSymptoms) => {
+    setSymptoms((prev) => ({ ...prev, ...partialSymptoms }));
+    setAiFilledKeys(new Set(Object.keys(partialSymptoms)));
   };
 
   const goBack = () => {
@@ -96,6 +109,8 @@ function NewAssessmentPage() {
         <p className="step-desc">{step.description}</p>
       </div>
 
+      <SymptomIntakeChat onApply={handleIntakeApply} />
+
       <div className="symptom-grid">
         {step.symptoms.map((s) => (
           <SymptomToggle
@@ -104,6 +119,7 @@ function NewAssessmentPage() {
             hint={s.hint}
             value={symptoms[s.key]}
             onChange={(value) => handleToggle(s.key, value)}
+            aiFilled={aiFilledKeys.has(s.key)}
           />
         ))}
       </div>

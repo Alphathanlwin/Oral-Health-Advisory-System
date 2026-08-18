@@ -5,6 +5,7 @@ import AiGuide from '../components/AiGuide';
 import RiskBadge from '../components/RiskBadge';
 import DiagnosisCard from '../components/DiagnosisCard';
 import RecommendationCard from '../components/RecommendationCard';
+import ChatPanel from '../components/ChatPanel';
 import { CONDITION_LABELS } from '../data/clinicalLabels';
 import { buildResultSummary } from '../utils/resultSummary';
 
@@ -124,6 +125,11 @@ function ResultPage() {
           </div>
         </section>
       )}
+
+      <section className="result-section">
+        <h2 className="result-section-title">Have a Question?</h2>
+        <ChatPanel assessmentId={assessment.id} />
+      </section>
 
       <div className="result-disclaimer">
         <InfoIcon />

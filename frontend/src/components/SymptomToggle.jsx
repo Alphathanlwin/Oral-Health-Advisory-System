@@ -6,7 +6,7 @@ function CheckIcon() {
   );
 }
 
-function SymptomToggle({ label, hint, value, onChange }) {
+function SymptomToggle({ label, hint, value, onChange, aiFilled = false }) {
   const active = value === true;
 
   return (
@@ -16,7 +16,10 @@ function SymptomToggle({ label, hint, value, onChange }) {
       </span>
 
       <div className="symptom-toggle-text">
-        <div className="symptom-toggle-label">{label}</div>
+        <div className="symptom-toggle-label">
+          {label}
+          {aiFilled && <span className="symptom-toggle-ai-badge">AI</span>}
+        </div>
         <div className="symptom-toggle-hint">{hint}</div>
       </div>
 
