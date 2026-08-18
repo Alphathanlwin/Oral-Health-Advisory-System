@@ -13,6 +13,10 @@ class Settings(BaseSettings):
     LLM_API_KEY: str = ""
     LLM_MODEL: str = "gpt-4o-mini"
     LLM_API_URL: str = "https://api.openai.com/v1/chat/completions"
+    TELEGRAM_BOT_TOKEN: str = ""
+    TELEGRAM_BOT_USERNAME: str = ""
+    TELEGRAM_WEBHOOK_SECRET: str = ""
+    GOOGLE_PLACES_API_KEY: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

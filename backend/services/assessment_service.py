@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 
 from sqlalchemy import func, select
@@ -10,8 +11,10 @@ from models.diagnosis import Diagnosis
 from models.enums import Condition, RiskLevel, Urgency
 from models.recommendation import Recommendation
 from models.symptom_response import SymptomResponse
+from models.user import User
 from schemas.assessment import AssessmentCreateRequest, AssessmentResponse
 from services.cv_service import CVService, CVServiceUnavailableError
+from services.notification_service import NotificationService
 from services.prolog_service import PrologService
 from utils.image_utils import decode_base64_image, save_image, validate_image
 
@@ -65,10 +68,11 @@ class AssessmentService:
     async def create(
         self,
         payload: AssessmentCreateRequest,
-        user_id: uuid.UUID,
+        user: User,
         db: AsyncSession,
         cv_service: CVService,
         prolog_service: PrologService,
+        notification_service: NotificationService,
     ) -> AssessmentResponse:
         symptoms = dict(payload.symptoms.model_dump())
         photo_urls: dict[str, str | None] = {}
@@ -100,7 +104,7 @@ class AssessmentService:
         diagnosis_result = await prolog_service.diagnose(active_symptoms)
 
         assessment = Assessment(
-            user_id=user_id,
+            user_id=user.id,
             risk_level=RiskLevel(diagnosis_result["overall_risk"]),
             photo_urls=photo_urls if any(photo_urls.values()) else None,
             image_analysis_result=image_analysis_result or None,
@@ -118,7 +122,19 @@ class AssessmentService:
         # above in memory. Async lazy-loading can't run implicitly outside
         # a greenlet context, so touching them later raises MissingGreenlet.
         await db.refresh(assessment, attribute_names=["id", "created_at", "risk_level"])
-        return AssessmentResponse.model_validate(assessment)
+        response = AssessmentResponse.model_validate(assessment)
+
+        if user.telegram_chat_id:
+            # Fire-and-forget: scheduled on the running event loop rather
+            # than awaited, so a slow or unreachable Telegram API can never
+            # delay this response. send_assessment_report() never raises —
+            # it only logs — so this task can't produce an "exception never
+            # retrieved" warning either.
+            asyncio.create_task(
+                notification_service.send_assessment_report(user.telegram_chat_id, response)
+            )
+
+        return response
 
     def _build_diagnosis(self, diagnosis: dict) -> Diagnosis:
         condition_key = diagnosis["condition"]

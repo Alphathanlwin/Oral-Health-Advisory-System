@@ -109,3 +109,25 @@ class LLMServiceUnavailableException(HTTPException):
                 "message": "The chat assistant is temporarily unavailable.",
             },
         )
+
+
+class ClinicServiceUnavailableException(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=503,
+            detail={
+                "code": "CLINIC_SERVICE_UNAVAILABLE",
+                "message": "Nearby clinic search is temporarily unavailable.",
+            },
+        )
+
+
+class InvalidLinkTokenException(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=400,
+            detail={
+                "code": "INVALID_LINK_TOKEN",
+                "message": "This Telegram link is invalid or has expired.",
+            },
+        )

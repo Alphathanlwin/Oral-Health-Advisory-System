@@ -7,6 +7,7 @@ from models.user import User
 from schemas.assessment import AssessmentCreateRequest
 from services.assessment_service import AssessmentService
 from services.cv_service import CVService
+from services.notification_service import NotificationService
 from services.prolog_service import PrologService
 from utils.response import success_response
 
@@ -50,9 +51,10 @@ async def create_assessment(
     assessment_service: AssessmentService = Depends(AssessmentService),
     cv_service: CVService = Depends(CVService),
     prolog_service: PrologService = Depends(PrologService),
+    notification_service: NotificationService = Depends(NotificationService),
 ):
     assessment = await assessment_service.create(
-        payload, current_user.id, db, cv_service, prolog_service
+        payload, current_user, db, cv_service, prolog_service, notification_service
     )
     return success_response(
         data=assessment.model_dump(mode="json"),
