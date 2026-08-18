@@ -17,7 +17,12 @@ async def _dispose_engine():
 
 
 async def _client() -> httpx.AsyncClient:
-    transport = httpx.ASGITransport(app=app)
+    # raise_app_exceptions=False: Starlette's ServerErrorMiddleware always
+    # re-raises the original exception after building the 500 response (so
+    # real servers can log it) — the default True here would propagate that
+    # re-raise into the test instead of returning the response our global
+    # exception handler already built.
+    transport = httpx.ASGITransport(app=app, raise_app_exceptions=False)
     return httpx.AsyncClient(transport=transport, base_url="http://test")
 
 

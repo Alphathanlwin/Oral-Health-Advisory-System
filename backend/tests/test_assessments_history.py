@@ -17,7 +17,7 @@ async def _dispose_engine():
 
 
 async def _client() -> httpx.AsyncClient:
-    transport = httpx.ASGITransport(app=app)
+    transport = httpx.ASGITransport(app=app, raise_app_exceptions=False)
     return httpx.AsyncClient(transport=transport, base_url="http://test")
 
 
@@ -55,7 +55,7 @@ async def test_user_can_list_and_fetch_own_assessments():
                 "pressure_pain": False,
                 "spontaneous_pain": False,
                 "bleeding_gums": True,
-                "swollen_gums": False,
+                "swollen_gums": True,
                 "receding_gums": False,
                 "black_spot": False,
                 "white_spot": False,
@@ -114,7 +114,7 @@ async def test_other_user_cannot_access_someone_else_assessment():
                 "pressure_pain": False,
                 "spontaneous_pain": False,
                 "bleeding_gums": True,
-                "swollen_gums": False,
+                "swollen_gums": True,
                 "receding_gums": False,
                 "black_spot": False,
                 "white_spot": False,

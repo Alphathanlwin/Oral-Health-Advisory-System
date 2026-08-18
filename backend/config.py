@@ -10,6 +10,9 @@ class Settings(BaseSettings):
     HUGGINGFACE_MODEL_URL: str
     ELEVENLABS_API_KEY: str = ""
     ELEVENLABS_VOICE_ID: str = ""
+    LLM_API_KEY: str = ""
+    LLM_MODEL: str = "gpt-4o-mini"
+    LLM_API_URL: str = "https://api.openai.com/v1/chat/completions"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

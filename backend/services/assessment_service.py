@@ -1,10 +1,10 @@
 import uuid
 
-from fastapi import HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from exceptions import AssessmentNotFoundException, ForbiddenException
 from models.assessment import Assessment
 from models.diagnosis import Diagnosis
 from models.enums import Condition, RiskLevel, Urgency
@@ -45,22 +45,21 @@ class AssessmentService:
         }
 
     async def get_for_user(self, assessment_id: str, user_id: uuid.UUID, db: AsyncSession) -> AssessmentResponse:
+        # Queried without a user_id filter so a mismatched owner can be told
+        # apart from a truly missing id (403 FORBIDDEN vs 404 NOT_FOUND),
+        # rather than collapsing both into 404.
         result = await db.execute(
             select(Assessment)
-            .where(Assessment.id == assessment_id, Assessment.user_id == user_id)
+            .where(Assessment.id == assessment_id)
             .options(
                 selectinload(Assessment.diagnoses).selectinload(Diagnosis.recommendations),
             )
         )
         assessment = result.scalar_one_or_none()
         if assessment is None:
-            raise HTTPException(
-                status_code=404,
-                detail={
-                    "code": "ASSESSMENT_NOT_FOUND",
-                    "message": f"Assessment with id {assessment_id} was not found.",
-                },
-            )
+            raise AssessmentNotFoundException(assessment_id)
+        if assessment.user_id != user_id:
+            raise ForbiddenException()
         return AssessmentResponse.model_validate(assessment)
 
     async def create(

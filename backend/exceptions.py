@@ -76,3 +76,36 @@ class TTSServiceUnavailableException(HTTPException):
                 "message": "The voice service is temporarily unavailable.",
             },
         )
+
+
+class AssessmentNotFoundException(HTTPException):
+    def __init__(self, assessment_id: str) -> None:
+        super().__init__(
+            status_code=404,
+            detail={
+                "code": "ASSESSMENT_NOT_FOUND",
+                "message": f"Assessment with id {assessment_id} was not found.",
+            },
+        )
+
+
+class ForbiddenException(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=403,
+            detail={
+                "code": "FORBIDDEN",
+                "message": "You do not have access to this resource.",
+            },
+        )
+
+
+class LLMServiceUnavailableException(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=503,
+            detail={
+                "code": "LLM_SERVICE_UNAVAILABLE",
+                "message": "The chat assistant is temporarily unavailable.",
+            },
+        )
